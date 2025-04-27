@@ -1,120 +1,95 @@
-import logging
-import re
-import os
-from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.dispatcher import FSMContext
-from aiogram.filters import Command
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.fsm.state import State, StatesGroup
-from aiogram import F
-import asyncio
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
 
-API_TOKEN = os.getenv('API_TOKEN')
-ADMIN_ID = int(os.getenv('ADMIN_ID', '894031843'))
+# Укажите свой токен
+TOKEN = 'YOUR_BOT_TOKEN'
 
-logging.basicConfig(level=logging.INFO)
+# Состояния для ConversationHandler
+NICKNAME, PLAYER_ID, AGE, KD, MATCHES = range(5)
 
-bot = Bot(token=API_TOKEN)
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
+# Администратор и другие пользователи
+admin_id = 'ADMIN_USER_ID'  # ID администратора
+user_ids = ['USER_ID_1', 'USER_ID_2']  # Другие пользователи
 
-class ApplicationForm(StatesGroup):
-    waiting_for_application = State()
+# Стартовая функция
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text("Привет! Я бот клана DEKTRIAN FAMILY. Хочешь вступить в наш клан? Пожалуйста, отправь заявку!")
+    return NICKNAME
 
-menu_keyboard = InlineKeyboardMarkup(row_width=2)
-menu_keyboard.add(
-    InlineKeyboardButton("Подать заявку", callback_data='submit_application'),
-    InlineKeyboardButton("FAQ", callback_data='faq'),
-    InlineKeyboardButton("Поддержка", callback_data='support')
-)
+# Получение никнейма
+def nickname(update: Update, context: CallbackContext):
+    context.user_data['nickname'] = update.message.text
+    update.message.reply_text("Отлично! Теперь, пожалуйста, укажи свой игровой айди.")
+    return PLAYER_ID
 
-application_response_keyboard = InlineKeyboardMarkup(row_width=2)
-application_response_keyboard.add(
-    InlineKeyboardButton("✅ Принять", callback_data='accept_application'),
-    InlineKeyboardButton("❌ Отклонить", callback_data='reject_application')
-)
+# Получение игрового ID
+def player_id(update: Update, context: CallbackContext):
+    context.user_data['player_id'] = update.message.text
+    update.message.reply_text("Теперь укажи свой возраст.")
+    return AGE
 
-user_applications = {}
+# Получение возраста
+def age(update: Update, context: CallbackContext):
+    context.user_data['age'] = update.message.text
+    update.message.reply_text("Какая у тебя КД за последние два сезона?")
+    return KD
 
-@dp.message(Command('start'))
-async def send_welcome(message: types.Message):
-    await message.answer_sticker('CAACAgIAAxkBAAEEZPZlZPZxvLrk9l8h2jEXAMPLE')
-    await message.answer(
-        """👋 Добро пожаловать! 🌟
-        
-Я ваш личный помощник.
-Выберите, что вам нужно:""",
-        reply_markup=menu_keyboard
+# Получение КД
+def kd(update: Update, context: CallbackContext):
+    context.user_data['kd'] = update.message.text
+    update.message.reply_text("Сколько матчей ты сыграл в этом и прошлом сезоне?")
+    return MATCHES
+
+# Получение матчей
+def matches(update: Update, context: CallbackContext):
+    context.user_data['matches'] = update.message.text
+    
+    # Создаём сообщение с заявкой
+    application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
+                  f"Игровой ник: {context.user_data['nickname']}\n" \
+                  f"Игровой айди: {context.user_data['player_id']}\n" \
+                  f"Возраст: {context.user_data['age']}\n" \
+                  f"КД за два сезона: {context.user_data['kd']}\n" \
+                  f"Матчи в этом и прошлом сезоне: {context.user_data['matches']}"
+    
+    # Отправляем заявку администратору и другим пользователям
+    context.bot.send_message(admin_id, application)
+    for user_id in user_ids:
+        context.bot.send_message(user_id, application)
+
+    update.message.reply_text("Ваша заявка отправлена! Спасибо, что подали её!")
+    return ConversationHandler.END
+
+# Функция для отмены
+def cancel(update: Update, context: CallbackContext):
+    update.message.reply_text("Заявка отменена.")
+    return ConversationHandler.END
+
+# Основная функция
+def main():
+    # Создаем Updater и передаем токен
+    updater = Updater(TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
+
+    # Создаем ConversationHandler для сбора данных
+    conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', start)],
+        states={
+            NICKNAME: [MessageHandler(Filters.text & ~Filters.command, nickname)],
+            PLAYER_ID: [MessageHandler(Filters.text & ~Filters.command, player_id)],
+            AGE: [MessageHandler(Filters.text & ~Filters.command, age)],
+            KD: [MessageHandler(Filters.text & ~Filters.command, kd)],
+            MATCHES: [MessageHandler(Filters.text & ~Filters.command, matches)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel)],
     )
 
-@dp.message(Command('admin'))
-async def admin_panel(message: types.Message):
-    if message.from_user.id == ADMIN_ID:
-        total = len(user_applications)
-        await message.answer(f"""📊 Панель администратора:
-Всего заявок: {total}""")
-    else:
-        await message.answer("⚠️ У вас нет доступа к этой команде.")
+    # Добавляем ConversationHandler в диспетчер
+    dispatcher.add_handler(conversation_handler)
 
-@dp.callback_query(F.data)
-async def process_callback(callback_query: types.CallbackQuery, state: FSMContext):
-    code = callback_query.data
-    if code == 'submit_application':
-        await bot.answer_callback_query(callback_query.id)
-        await bot.send_message(callback_query.from_user.id, "📝 Пожалуйста, напишите свое имя и номер телефона:")
-        await ApplicationForm.waiting_for_application.set()
-    elif code == 'faq':
-        text = """🔍 Часто задаваемые вопросы:
-• Как работает бот?
-• Как оформить заявку?
-• Как связаться с поддержкой?"""
-        await bot.answer_callback_query(callback_query.id)
-        await bot.send_message(callback_query.from_user.id, text)
-    elif code == 'support':
-        text = "😊 Для связи с нашей поддержкой напишите: @SupportUsername"
-        await bot.answer_callback_query(callback_query.id)
-        await bot.send_message(callback_query.from_user.id, text)
-    elif code == 'accept_application':
-        await bot.answer_callback_query(callback_query.id)
-        await bot.send_message(callback_query.from_user.id, "✅ Заявка принята!")
-    elif code == 'reject_application':
-        await bot.answer_callback_query(callback_query.id)
-        await bot.send_message(callback_query.from_user.id, "❌ Заявка отклонена.")
-    else:
-        text = "⚠️ Неизвестная команда."
-        await bot.answer_callback_query(callback_query.id)
-        await bot.send_message(callback_query.from_user.id, text)
-
-@dp.message(ApplicationForm.waiting_for_application, content_types=types.ContentTypes.TEXT)
-async def process_application(message: types.Message, state: FSMContext):
-    user_data = message.text
-    phone_pattern = re.compile(r'\+?\d{10,15}')
-    if not phone_pattern.search(user_data):
-        await message.reply("⚠️ Пожалуйста, укажите корректный номер телефона!")
-        return
-    user_applications[message.from_user.id] = user_data
-    await bot.send_message(message.chat.id, "✅ Спасибо! Ваша заявка отправлена.")
-    await bot.send_message(
-        ADMIN_ID,
-        f"""🗓️ Новая заявка от @{message.from_user.username or message.from_user.id}:
-{user_data}
-ID пользователя: {message.from_user.id}""",
-        reply_markup=application_response_keyboard
-    )
-    await state.clear()
-
-@dp.message()
-async def fallback(message: types.Message):
-    await message.reply("❓ Я вас не понял. Пожалуйста, используйте команды или нажмите /start для начала.")
-
-async def main():
-    # Запуск бота
-    try:
-        await dp.start_polling()
-    except Exception as e:
-        logging.error(f"Ошибка при запуске бота: {e}")
+    # Запускаем бота
+    updater.start_polling()
+    updater.idle()
 
 if __name__ == '__main__':
-    # Запуск через asyncio
-    asyncio.run(main())
+    main()

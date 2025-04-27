@@ -185,4 +185,4 @@ async def button_callback(update: Update, context: CallbackContext):
         await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
     return
 
-#
+# Функция для отмены

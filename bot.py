@@ -244,13 +244,9 @@ def main() -> None:
     fallbacks=[]  # Если нужно обработать ошибки или завершение процесса
 )
 
-    # Создание приложения и добавление обработчиков
-application = Application.builder().token(TOKEN).build()
+    application.add_handler(conversation_handler)
 
-port = int(os.environ.get("PORT", 10000))
-
-# Добавляем обработчик
-application.add_handler(conversation_handler)
+    port = int(os.environ.get("PORT", 10000))
 
     application.run_webhook(
         listen="0.0.0.0",  

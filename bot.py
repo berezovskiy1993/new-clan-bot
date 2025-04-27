@@ -20,10 +20,8 @@ def get_buttons():
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
-    # Отправляем картинку
-    await update.message.reply_photo(
-        photo="https://ibb.co/JRbbTWsQ",  # URL изображения
-        caption="Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
+    await update.message.reply_text(
+        "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
         reply_markup=get_buttons()  # Добавляем две кнопки
     )
     return READY
@@ -208,5 +206,15 @@ def main() -> None:
 
     application.add_handler(conversation_handler)
 
+    # Указываем порт для вебхука
     port = int(os.environ.get("PORT", 10000))
 
+    application.run_webhook(
+        listen="0.0.0.0",  
+        port=port,
+        url_path=TOKEN,  
+        webhook_url=f"https://clan-bot-2-1.onrender.com/{TOKEN}",
+    )
+
+if __name__ == '__main__':
+    main()

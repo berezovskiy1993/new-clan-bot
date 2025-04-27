@@ -11,7 +11,7 @@ NICKNAME, PLAYER_ID, AGE, KD, MATCHES = range(5)
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text("Привет! Я бот клана DEKTRIAN FAMILY. Если хочешь подать заявку на вступление в клан, то отправь любой символ в чат!")
+    await update.message.reply_text("Привет! Я бот клана DEKTRIAN FAMILY. Если хочешь подать заявку на вступление в клан - для начала напиши свой игровой никнейм!")
     return NICKNAME
 
 # Получение никнейма

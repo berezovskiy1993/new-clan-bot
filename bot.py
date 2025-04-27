@@ -10,16 +10,19 @@ GROUP_ID = -1002640250280  # ID закрытой группы
 # Состояния для ConversationHandler
 NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS = range(8)
 
-# Функция для создания кнопки "Начать с начала"
-def get_reset_button():
-    keyboard = [[InlineKeyboardButton("Начать с начала", callback_data='reset')]]
+# Функция для создания кнопок "Начать с начала" и "Критерии"
+def get_buttons():
+    keyboard = [
+        [InlineKeyboardButton("Начать с начала", callback_data='reset')],
+        [InlineKeyboardButton("Критерии", callback_data='criteria')]
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(
         "Привет! Я бот клана DEKTRIAN FAMILY. Если хочешь подать заявку на вступление в клан - для начала напиши свой игровой никнейм!",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем две кнопки
     )
     return NICKNAME
 
@@ -28,7 +31,7 @@ async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
         "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return PLAYER_ID
 
@@ -37,7 +40,7 @@ async def player_id(update: Update, context: CallbackContext) -> int:
     context.user_data['player_id'] = update.message.text
     await update.message.reply_text(
         "Сколько тебе полных лет?",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return AGE
 
@@ -46,7 +49,7 @@ async def age(update: Update, context: CallbackContext) -> int:
     context.user_data['age'] = update.message.text
     await update.message.reply_text(
         "Ты девочка или парень?",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return GENDER
 
@@ -55,7 +58,7 @@ async def gender(update: Update, context: CallbackContext) -> int:
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return KD_CURRENT
 
@@ -64,7 +67,7 @@ async def kd_current(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_current'] = update.message.text
     await update.message.reply_text(
         "Какой у тебя КД за прошлый сезон?",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return KD_PREVIOUS
 
@@ -73,7 +76,7 @@ async def kd_previous(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_previous'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в текущем сезоне?",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return MATCHES_CURRENT
 
@@ -82,7 +85,7 @@ async def matches_current(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_current'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в прошлом сезоне?",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return MATCHES_PREVIOUS
 
@@ -115,7 +118,7 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
     # Уведомление для пользователя
     await update.message.reply_text(
         "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
-        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
     return ConversationHandler.END
 
@@ -124,16 +127,33 @@ async def reset(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()  # Очищаем все данные пользователя
     await update.callback_query.message.edit_text(
         "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
-        reply_markup=get_reset_button()  # Кнопка сброса
+        reply_markup=get_buttons()  # Кнопка сброса
     )
     return NICKNAME
 
-# Функция для обработки нажатия на кнопку сброса (callback query)
+# Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset':  # Проверяем callback_data
         # Выполняем сброс данных
         return await reset(update, context)
+    elif query.data == 'criteria':  # Кнопка для показа критериев
+        criteria_text = (
+            "Критерии клана Фемили:\n"
+            "1. Опыт игры в PUBG Mobile не менее 6 месяцев.\n"
+            "2. Уровень игры - от 4000 рейтинга.\n"
+            "3. Минимум 20 сыгранных матчей в текущем сезоне.\n\n"
+            "Критерии клана Академ:\n"
+            "1. Опыт игры не менее 3 месяцев.\n"
+            "2. Уровень игры - от 2000 рейтинга.\n"
+            "3. Минимум 10 сыгранных матчей в текущем сезоне.\n\n"
+            "Критерии клана Еспортс:\n"
+            "1. Опыт игры в PUBG Mobile не менее 1 года.\n"
+            "2. Уровень игры - от 5000 рейтинга.\n"
+            "3. Минимум 30 сыгранных матчей в текущем сезоне."
+        )
+        await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
+    return
 
 # Функция для отмены
 async def cancel(update: Update, context: CallbackContext) -> int:

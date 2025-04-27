@@ -1,5 +1,5 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext, CallbackQueryHandler
 import os
 
 # Токен и ID администратора
@@ -151,7 +151,7 @@ def main() -> None:
             KD: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd)],
             MATCHES: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches)],
         },
-        fallbacks=[MessageHandler(filters.CallbackQuery, button)],
+        fallbacks=[CallbackQueryHandler(button)],  # Используем CallbackQueryHandler для обработки нажатий кнопок
     )
 
     # Добавляем ConversationHandler в приложение

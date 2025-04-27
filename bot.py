@@ -25,13 +25,11 @@ async def start(update: Update, context: CallbackContext) -> int:
         photo="https://ibb.co/JRbbTWsQ",  # Ссылка на картинку
         caption="Добро пожаловать в DEKTRIAN FAMILY!"  # Подпись под картинкой
     )
-    
     # Затем отправляем текстовое сообщение
     await update.message.reply_text(
         "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
         reply_markup=get_buttons()  # Добавляем две кнопки
     )
-    
     return READY
 
 # Проверка на готовность подать заявку
@@ -187,17 +185,4 @@ async def button_callback(update: Update, context: CallbackContext):
         await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
     return
 
-# Функция для отмены
-async def cancel(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text("Заявка отменена.")
-    return ConversationHandler.END
-
-# Основная функция
-def main() -> None:
-    application = Application.builder().token(TOKEN).build()
-
-    conversation_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={
-            READY: [MessageHandler(filters.TEXT & ~filters.COMMAND, ready)],
-            NICKNAME
+#

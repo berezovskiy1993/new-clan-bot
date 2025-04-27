@@ -134,50 +134,45 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
         
-        # Получаем юзернейм и айди пользователя Telegram
-        telegram_username = update.message.from_user.username
-        telegram_user_id = update.message.from_user.id
-        
-        # Формируем заявку
-        application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
-                      f"Игровой ник: {context.user_data['nickname']}\n" \
-                      f"Игровой айди: {context.user_data['player_id']}\n" \
-                      f"Возраст: {context.user_data['age']}\n" \
-                      f"Пол: {context.user_data['gender']}\n" \
-                      f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
-                      f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
-                      f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
-                      f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
-                      f"Telegram Username: @{telegram_username}\n" \
-                      f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
+    
+    # Формируем заявку
+    application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
+                  f"Игровой ник: {context.user_data['nickname']}\n" \
+                  f"Игровой айди: {context.user_data['player_id']}\n" \
+                  f"Возраст: {context.user_data['age']}\n" \
+                  f"Пол: {context.user_data['gender']}\n" \
+                  f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
+                  f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
+                  f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
+                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
+                  f"Telegram Username: @{telegram_username}\n" \
+                  f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
 
-        # Отправляем заявку админу и группе
-        try:
-            await context.bot.send_message(ADMIN_ID, application)
-        except Exception as e:
-            await update.message.reply_text(f"Ошибка при отправке сообщения админу: {e}")
-        
-        try:
-            await context.bot.send_message(GROUP_ID, application)
-        except Exception as e:
-            await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
+    # Отправляем заявку админу и группе
+    try:
+        await context.bot.send_message(ADMIN_ID, application)
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка при отправке сообщения админу: {e}")
+    
+    try:
+        await context.bot.send_message(GROUP_ID, application)
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
 
-        # Отправка скриншотов
+# Отправка скриншотов
         try:
             await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_1'])
             await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_2'])
         except Exception as e:
             await update.message.reply_text(f"Ошибка при отправке скриншотов: {e}")
 
-        # Уведомление для пользователя
-        await update.message.reply_text(
-            "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
-            reply_markup=get_buttons()  # Добавляем кнопки
-        )
-        return ConversationHandler.END
-    else:
-        await update.message.reply_text("Пожалуйста, отправьте второй скриншот.")
-        return SCREENSHOT_2
+
+    # Уведомление для пользователя
+    await update.message.reply_text(
+        "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
+        reply_markup=get_buttons()  # Добавляем кнопки
+    )
+    return ConversationHandler.END
 
 # Функция для сброса данных
 async def reset(update: Update, context: CallbackContext) -> int:
@@ -191,15 +186,43 @@ async def reset(update: Update, context: CallbackContext) -> int:
 # Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
-    if query.data == 'reset':
-        return reset(update, context)
+    if query.data == 'reset':  # Проверяем callback_data
+        # Выполняем сброс данных
+        return await reset(update, context)
+    elif query.data == 'criteria':  # Кнопка для показа критериев
+        criteria_text = (
+            "Критерии клана DEKTRIAN FAMILY:\n"
+            "1. Смена тега в течении 7 дней.\n"
+            "2. Кд на 100 матчей (Девушки - 4; Мужчины - 5)\n"
+            "3. Возраст 16+.\n"
+            "4. Актив в телеграмм чате.\n"
+            "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
+            "Критерии клана DEKTRIAN ACADEMY:\n"
+            "1. Смена тега в течении 7 дней.\n"
+            "2. Кд и матчи не важны.\n"
+            "3. Возраст 14+.\n"
+            "4. Актив в телеграмм чате.\n"
+            "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
+            "Критерии клана DEKTRIAN ESPORTS:\n"
+            "1. Смена тега в течении 7 дней.\n"
+            "2. Возраст 16+\n"
+            "3. Наличие результатов и хайлайтов\n"
+            "4. Преемущество отдается собранным пакам\n"            
+        )
+        await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
+    return
 
-# Основная функция для запуска бота
-def main():
+# Функция для отмены
+async def cancel(update: Update, context: CallbackContext) -> int:
+    await update.message.reply_text("Заявка отменена.")
+    return ConversationHandler.END
+
+# Основная функция
+def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
     conversation_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", start)],
+        entry_points=[CommandHandler('start', start)],
         states={
             READY: [MessageHandler(filters.TEXT & ~filters.COMMAND, ready)],
             NICKNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, nickname)],
@@ -210,14 +233,20 @@ def main():
             KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
             MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
             MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
-            SCREENSHOT_1: [MessageHandler(filters.PHOTO & ~filters.COMMAND, screenshot_1)],
-            SCREENSHOT_2: [MessageHandler(filters.PHOTO & ~filters.COMMAND, screenshot_2)],
         },
-        fallbacks=[CallbackQueryHandler(button_callback)],
+        fallbacks=[CommandHandler('cancel', cancel), CallbackQueryHandler(button_callback)],
     )
 
     application.add_handler(conversation_handler)
-    application.run_polling()
 
-if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+
+    application.run_webhook(
+        listen="0.0.0.0",  
+        port=port,
+        url_path=TOKEN,  
+        webhook_url=f"https://clan-bot-2-1.onrender.com/{TOKEN}",
+    )
+
+if __name__ == '__main__':
     main()

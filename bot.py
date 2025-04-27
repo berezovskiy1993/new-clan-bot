@@ -1,15 +1,12 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext
 
-# Укажите свой токен
-TOKEN = 'YOUR_BOT_TOKEN'
+# Токен и ID администратора
+TOKEN = '7912601677:AAE_saIpU_55S2dgEdnEnnXov0pw33BPVu0'
+ADMIN_ID = 894031843  # ID администратора
 
 # Состояния для ConversationHandler
 NICKNAME, PLAYER_ID, AGE, KD, MATCHES = range(5)
-
-# Администратор и другие пользователи
-admin_id = 'ADMIN_USER_ID'  # ID администратора
-user_ids = ['USER_ID_1', 'USER_ID_2']  # Другие пользователи
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
@@ -52,10 +49,8 @@ async def matches(update: Update, context: CallbackContext) -> int:
                   f"КД за два сезона: {context.user_data['kd']}\n" \
                   f"Матчи в этом и прошлом сезоне: {context.user_data['matches']}"
     
-    # Отправляем заявку администратору и другим пользователям
-    await context.bot.send_message(admin_id, application)
-    for user_id in user_ids:
-        await context.bot.send_message(user_id, application)
+    # Отправляем заявку только админу
+    await context.bot.send_message(ADMIN_ID, application)
 
     await update.message.reply_text("Ваша заявка отправлена! Спасибо, что подали её!")
     return ConversationHandler.END
@@ -66,7 +61,7 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 # Основная функция
-async def main() -> None:
+def main() -> None:
     # Создаем Application и передаем токен
     application = Application.builder().token(TOKEN).build()
 
@@ -86,9 +81,8 @@ async def main() -> None:
     # Добавляем ConversationHandler в приложение
     application.add_handler(conversation_handler)
 
-    # Запускаем бота
-    await application.run_polling()
+    # Запускаем бота без asyncio.run()
+    application.run_polling()
 
 if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+    main()

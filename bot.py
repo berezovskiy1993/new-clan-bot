@@ -20,15 +20,14 @@ def get_buttons():
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
-    # Сначала отправляем картинку
-    await update.message.reply_photo(
-        photo="https://ibb.co/JRbbTWsQ",  # Ссылка на картинку
-        caption="Добро пожаловать в DEKTRIAN FAMILY!"  # Подпись под картинкой
-    )
-    # Затем отправляем текстовое сообщение
+    # Отправляем приветственное сообщение и картинку
     await update.message.reply_text(
         "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
         reply_markup=get_buttons()  # Добавляем две кнопки
+    )
+    await update.message.reply_photo(
+        photo="https://ibb.co/JRbbTWsQ",  # Ссылка на картинку
+        caption="Добро пожаловать в DEKTRIAN FAMILY!"  # Подпись под картинкой
     )
     return READY
 
@@ -186,3 +185,40 @@ async def button_callback(update: Update, context: CallbackContext):
     return
 
 # Функция для отмены
+async def cancel(update: Update, context: CallbackContext) -> int:
+    await update.message.reply_text("Заявка отменена.")
+    return ConversationHandler.END
+
+# Основная функция
+def main() -> None:
+    application = Application.builder().token(TOKEN).build()
+
+    conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', start)],
+        states={
+            READY: [MessageHandler(filters.TEXT & ~filters.COMMAND, ready)],
+            NICKNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, nickname)],
+            PLAYER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, player_id)],
+            AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
+            GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender)],
+            KD_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_current)],
+            KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
+            MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
+            MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel), CallbackQueryHandler(button_callback)],
+    )
+
+    application.add_handler(conversation_handler)
+
+    port = int(os.environ.get("PORT", 10000))
+
+    application.run_webhook(
+        listen="0.0.0.0",  
+        port=port,
+        url_path=TOKEN,  
+        webhook_url=f"https://clan-bot-2-1.onrender.com/{TOKEN}",
+    )
+
+if __name__ == '__main__':
+    main()

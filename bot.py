@@ -118,22 +118,27 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
 
 # Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
+    # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
         await update.message.reply_text(
             "Теперь отправь второй скриншот из игры.",
             reply_markup=get_buttons()  # Добавляем кнопки
         )
-        return SCREENSHOT_2
+        return SCREENSHOT_2  # Переходим к следующему шагу, ожидая второй скриншот
     else:
         await update.message.reply_text("Пожалуйста, отправьте скриншот.")
-        return SCREENSHOT_1
+        return SCREENSHOT_1  # Ожидаем повторно скриншот
 
 # Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
+    # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
-        
+       
+  # Получаем юзернейм и айди пользователя Telegram
+        telegram_username = update.message.from_user.username
+        telegram_user_id = update.message.from_user.id        
     
     # Формируем заявку
     application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \

@@ -22,7 +22,8 @@ async def start(update: Update, context: CallbackContext) -> int:
 async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data['nickname'] = update.message.text
     keyboard = [
-        [InlineKeyboardButton("Назад", callback_data="back_start")]
+        [InlineKeyboardButton("Назад", callback_data="back_start")],
+        [InlineKeyboardButton("Далее", callback_data="next_player_id")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Отлично! Теперь, пожалуйста, укажи свой игровой айди.", reply_markup=reply_markup)
@@ -36,7 +37,8 @@ async def player_id(update: Update, context: CallbackContext) -> int:
     
     context.user_data['player_id'] = update.message.text
     keyboard = [
-        [InlineKeyboardButton("Назад", callback_data="back_nickname")]
+        [InlineKeyboardButton("Назад", callback_data="back_nickname")],
+        [InlineKeyboardButton("Далее", callback_data="next_age")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Теперь укажи свой возраст.", reply_markup=reply_markup)
@@ -50,7 +52,8 @@ async def age(update: Update, context: CallbackContext) -> int:
 
     context.user_data['age'] = update.message.text
     keyboard = [
-        [InlineKeyboardButton("Назад", callback_data="back_player_id")]
+        [InlineKeyboardButton("Назад", callback_data="back_player_id")],
+        [InlineKeyboardButton("Далее", callback_data="next_kd")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Какая у тебя КД за последние два сезона?", reply_markup=reply_markup)
@@ -64,7 +67,8 @@ async def kd(update: Update, context: CallbackContext) -> int:
 
     context.user_data['kd'] = update.message.text
     keyboard = [
-        [InlineKeyboardButton("Назад", callback_data="back_age")]
+        [InlineKeyboardButton("Назад", callback_data="back_age")],
+        [InlineKeyboardButton("Далее", callback_data="next_matches")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Сколько матчей ты сыграл в этом и прошлом сезоне?", reply_markup=reply_markup)
@@ -109,6 +113,29 @@ async def back_age(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Возвращаемся к вводу возраста.")
     return AGE
 
+# Обработчики нажатий кнопок
+async def button(update: Update, context: CallbackContext) -> int:
+    query = update.callback_query
+    data = query.data
+    if data == "start_application":
+        return await nickname(update, context)
+    elif data == "next_player_id":
+        return await player_id(update, context)
+    elif data == "next_age":
+        return await age(update, context)
+    elif data == "next_kd":
+        return await kd(update, context)
+    elif data == "next_matches":
+        return await matches(update, context)
+    elif data == "back_start":
+        return await back_start(update, context)
+    elif data == "back_nickname":
+        return await back_nickname(update, context)
+    elif data == "back_player_id":
+        return await back_player_id(update, context)
+    elif data == "back_age":
+        return await back_age(update, context)
+
 # Основная функция
 def main() -> None:
     # Создаем Application и передаем токен
@@ -124,7 +151,7 @@ def main() -> None:
             KD: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd)],
             MATCHES: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches)],
         },
-        fallbacks=[],
+        fallbacks=[MessageHandler(filters.CallbackQuery, button)],
     )
 
     # Добавляем ConversationHandler в приложение

@@ -111,7 +111,7 @@ async def matches_current(update: Update, context: CallbackContext) -> int:
 async def matches_previous(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_previous'] = update.message.text
     await update.message.reply_text(
-        "Пожалуйста, отправь первый скриншот из игры.",
+        "Пожалуйста, отправь скриншот статистики из игры за текущий сезон.",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
     return SCREENSHOT_1
@@ -122,7 +122,7 @@ async def screenshot_1(update: Update, context: CallbackContext) -> int:
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
         await update.message.reply_text(
-            "Теперь отправь второй скриншот из игры.",
+            "Теперь отправь скриншот статистики из игры за прошлый сезон.",
             reply_markup=get_buttons()  # Добавляем кнопки
         )
         return SCREENSHOT_2  # Переходим к следующему шагу, ожидая второй скриншот

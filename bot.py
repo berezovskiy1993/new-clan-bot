@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext
 import os
 
@@ -10,67 +10,87 @@ GROUP_ID = -1002640250280  # ID закрытой группы
 # Состояния для ConversationHandler
 NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS = range(8)
 
+# Функция для создания кнопки "Начать с начала"
+def get_reset_button():
+    keyboard = [[InlineKeyboardButton("Начать с начала", callback_data='reset')]]
+    return InlineKeyboardMarkup(keyboard)
+
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text("Привет! Я бот клана DEKTRIAN FAMILY. Если хочешь подать заявку на вступление в клан - для начала напиши свой игровой никнейм!")
+    await update.message.reply_text(
+        "Привет! Я бот клана DEKTRIAN FAMILY. Если хочешь подать заявку на вступление в клан - для начала напиши свой игровой никнейм!",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return NICKNAME
 
 # Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data['nickname'] = update.message.text
-    await update.message.reply_text("Отлично! Теперь, пожалуйста, укажи свой игровой айди.")
+    await update.message.reply_text(
+        "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return PLAYER_ID
 
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
     context.user_data['player_id'] = update.message.text
-    await update.message.reply_text("Сколько тебе полных лет?")
+    await update.message.reply_text(
+        "Сколько тебе полных лет?",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return AGE
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
     context.user_data['age'] = update.message.text
-    await update.message.reply_text("Ты девочка или парень?")
+    await update.message.reply_text(
+        "Ты девочка или парень?",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return GENDER
 
-# Получение пола (без проверки)
+# Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
     context.user_data['gender'] = update.message.text.lower()
-    await update.message.reply_text("Какая у тебя КД за текущий сезон?")
+    await update.message.reply_text(
+        "Какая у тебя КД за текущий сезон?",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return KD_CURRENT
 
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_current'] = update.message.text
-    await update.message.reply_text("Какой у тебя КД за прошлый сезон?")
+    await update.message.reply_text(
+        "Какой у тебя КД за прошлый сезон?",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return KD_PREVIOUS
 
 # Получение КД за прошлый сезон
 async def kd_previous(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_previous'] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?")
+    await update.message.reply_text(
+        "Сколько матчей ты сыграл в текущем сезоне?",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return MATCHES_CURRENT
 
 # Получение матчей за текущий сезон
 async def matches_current(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_current'] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?")
+    await update.message.reply_text(
+        "Сколько матчей ты сыграл в прошлом сезоне?",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return MATCHES_PREVIOUS
 
 # Получение матчей за прошлый сезон
 async def matches_previous(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_previous'] = update.message.text
     
-    # Получаем данные о пользователе
-    user = update.message.from_user
-    
-    # Формирование ссылки на профиль пользователя (с помощью ID, который кликабелен)
-    user_id_link = f"tg://user?id={user.id}"  # Ссылка через user.id (будет работать в мобильном приложении)
-    
-    # Получение юзернейма
-    username = user.username if user.username else "Не указан"
-
-    # Создаём сообщение с заявкой
+    # Формируем заявку
     application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
                   f"Игровой ник: {context.user_data['nickname']}\n" \
                   f"Игровой айди: {context.user_data['player_id']}\n" \
@@ -79,29 +99,33 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
                   f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
                   f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
                   f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
-                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
-                  f"Юзернейм: @{username}"
+                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n"
 
-    # Отправляем заявку админу
+    # Отправляем заявку админу и группе
     try:
         await context.bot.send_message(ADMIN_ID, application)
     except Exception as e:
         await update.message.reply_text(f"Ошибка при отправке сообщения админу: {e}")
-
-    # Отправляем заявку в закрытую группу
+    
     try:
         await context.bot.send_message(GROUP_ID, application)
     except Exception as e:
         await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
 
     # Уведомление для пользователя
-    await update.message.reply_text("Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.")
+    await update.message.reply_text(
+        "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
+        reply_markup=get_reset_button()  # Добавляем кнопку сброса
+    )
     return ConversationHandler.END
 
-# Функция для сброса данных и начала подачи заявки с самого начала
+# Функция для сброса данных
 async def reset(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()  # Очищаем все данные пользователя
-    await update.message.reply_text("Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!")
+    await update.callback_query.message.edit_text(
+        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
+        reply_markup=get_reset_button()  # Кнопка сброса
+    )
     return NICKNAME
 
 # Функция для отмены
@@ -111,10 +135,8 @@ async def cancel(update: Update, context: CallbackContext) -> int:
 
 # Основная функция
 def main() -> None:
-    # Создаем Application и передаем токен
     application = Application.builder().token(TOKEN).build()
 
-    # Создаем ConversationHandler для сбора данных
     conversation_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
@@ -130,18 +152,15 @@ def main() -> None:
         fallbacks=[CommandHandler('cancel', cancel), CommandHandler('reset', reset)],
     )
 
-    # Добавляем ConversationHandler в приложение
     application.add_handler(conversation_handler)
 
-    # Получаем порт из переменной окружения (на Render это будет порт 10000)
     port = int(os.environ.get("PORT", 10000))
 
-    # Настройка вебхука
     application.run_webhook(
-        listen="0.0.0.0",  # Слушаем все IP
-        port=port,  # Порт, на котором сервер будет слушать
-        url_path=TOKEN,  # URL-часть для вебхука
-        webhook_url=f"https://clan-bot-2-1.onrender.com/{TOKEN}",  # Полный URL вебхука
+        listen="0.0.0.0",  
+        port=port,
+        url_path=TOKEN,  
+        webhook_url=f"https://clan-bot-2-1.onrender.com/{TOKEN}",
     )
 
 if __name__ == '__main__':

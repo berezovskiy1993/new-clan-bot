@@ -210,4 +210,14 @@ def main():
             KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
             MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
             MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
-            SCREENSHOT_1
+            SCREENSHOT_1: [MessageHandler(filters.PHOTO & ~filters.COMMAND, screenshot_1)],
+            SCREENSHOT_2: [MessageHandler(filters.PHOTO & ~filters.COMMAND, screenshot_2)],
+        },
+        fallbacks=[CallbackQueryHandler(button_callback)],
+    )
+
+    application.add_handler(conversation_handler)
+    application.run_polling()
+
+if __name__ == "__main__":
+    main()

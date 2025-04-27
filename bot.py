@@ -100,7 +100,7 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
 
     # Уведомление для пользователя
-    await update.message.reply_text("Ваша заявка отправлена! Спасибо, что подали её!")
+    await update.message.reply_text("Ваша заявка отправлена, Спасибо! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.")
     return ConversationHandler.END
 
 # Функция для отмены

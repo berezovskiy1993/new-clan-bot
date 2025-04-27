@@ -24,13 +24,13 @@ async def nickname(update: Update, context: CallbackContext) -> int:
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
     context.user_data['player_id'] = update.message.text
-    await update.message.reply_text("Теперь укажи свой возраст.")
+    await update.message.reply_text("Сколько тебе полных лет?")
     return AGE
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
     context.user_data['age'] = update.message.text
-    await update.message.reply_text("Ты девочка или парень? Напиши 'девочка' или 'парень'.")
+    await update.message.reply_text("Ты девочка или парень?")
     return GENDER
 
 # Получение пола (без проверки)
@@ -42,7 +42,7 @@ async def gender(update: Update, context: CallbackContext) -> int:
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_current'] = update.message.text
-    await update.message.reply_text("А какая у тебя КД за прошлый сезон?")
+    await update.message.reply_text("Какой у тебя КД за прошлый сезон?")
     return KD_PREVIOUS
 
 # Получение КД за прошлый сезон
@@ -77,10 +77,9 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
                   f"Возраст: {context.user_data['age']}\n" \
                   f"Пол: {context.user_data['gender']}\n" \
                   f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
-                  f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
                   f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
+                  f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
                   f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
-                  f"Пользователь Telegram (ID): [Профиль]({user_id_link})\n" \
                   f"Юзернейм: @{username}"
 
     # Отправляем заявку админу
@@ -96,7 +95,7 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
 
     # Уведомление для пользователя
-    await update.message.reply_text("Ваша заявка отправлена! Спасибо, что подали её!")
+    await update.message.reply_text("Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.")
     return ConversationHandler.END
 
 # Функция для сброса данных и начала подачи заявки с самого начала

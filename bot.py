@@ -23,7 +23,7 @@ async def start(update: Update, context: CallbackContext) -> int:
     # Отправляем приветственное сообщение и картинку
     await update.message.reply_photo(
         photo="https://ibb.co/JRbbTWsQ",  # Ссылка на картинку
-        caption="Добро пожаловать в DEKTRIAN FAMILY!"  # Подпись под картинкой
+        caption=" "  # Подпись под картинкой
     )
     await update.message.reply_text(
         "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
@@ -35,7 +35,7 @@ async def start(update: Update, context: CallbackContext) -> int:
 async def ready(update: Update, context: CallbackContext) -> int:
     user_response = update.message.text.lower()
     if user_response == 'да':
-        await update.message.reply_text("Напиши свой игровой никнейм.")
+        await update.message.reply_text("Отлично! Напиши свой игровой никнейм.")
         return NICKNAME
     elif user_response == 'нет':
         await update.message.reply_text("Если передумаешь, напиши 'да'.")

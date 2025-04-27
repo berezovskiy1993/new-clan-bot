@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext
 import os
 
@@ -11,81 +11,37 @@ NICKNAME, PLAYER_ID, AGE, KD, MATCHES = range(5)
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
-    keyboard = [
-        [InlineKeyboardButton("Начать заявку", callback_data="start_application")],
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Привет! Я бот клана DEKTRIAN FAMILY. Хочешь вступить в наш клан? Пожалуйста, отправь заявку!", reply_markup=reply_markup)
+    await update.message.reply_text("Привет! Я бот клана DEKTRIAN FAMILY. Хочешь вступить в наш клан? Пожалуйста, отправь заявку!")
     return NICKNAME
 
 # Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data['nickname'] = update.message.text
-    keyboard = [
-        [InlineKeyboardButton("Далее", callback_data="next_player_id")],
-        [InlineKeyboardButton("Назад", callback_data="back_start")],
-        [InlineKeyboardButton("Отменить", callback_data="cancel")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Отлично! Теперь, пожалуйста, укажи свой игровой айди.", reply_markup=reply_markup)
+    await update.message.reply_text("Отлично! Теперь, пожалуйста, укажи свой игровой айди.")
     return PLAYER_ID
 
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
-    if not update.message.text.isdigit():
-        await update.message.reply_text("Айди должен состоять только из чисел. Пожалуйста, попробуй снова.")
-        return PLAYER_ID
-    
     context.user_data['player_id'] = update.message.text
-    keyboard = [
-        [InlineKeyboardButton("Далее", callback_data="next_age")],
-        [InlineKeyboardButton("Назад", callback_data="back_nickname")],
-        [InlineKeyboardButton("Отменить", callback_data="cancel")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Теперь укажи свой возраст.", reply_markup=reply_markup)
+    await update.message.reply_text("Теперь укажи свой возраст.")
     return AGE
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
-    if not update.message.text.isdigit():
-        await update.message.reply_text("Возраст должен быть числом. Пожалуйста, попробуй снова.")
-        return AGE
-
     context.user_data['age'] = update.message.text
-    keyboard = [
-        [InlineKeyboardButton("Далее", callback_data="next_kd")],
-        [InlineKeyboardButton("Назад", callback_data="back_player_id")],
-        [InlineKeyboardButton("Отменить", callback_data="cancel")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Какая у тебя КД за последние два сезона?", reply_markup=reply_markup)
+    await update.message.reply_text("Какая у тебя КД за последние два сезона?")
     return KD
 
 # Получение КД
 async def kd(update: Update, context: CallbackContext) -> int:
-    if not update.message.text.isdigit():
-        await update.message.reply_text("КД должно быть числом. Пожалуйста, попробуй снова.")
-        return KD
-
     context.user_data['kd'] = update.message.text
-    keyboard = [
-        [InlineKeyboardButton("Далее", callback_data="next_matches")],
-        [InlineKeyboardButton("Назад", callback_data="back_age")],
-        [InlineKeyboardButton("Отменить", callback_data="cancel")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Сколько матчей ты сыграл в этом и прошлом сезоне?", reply_markup=reply_markup)
+    await update.message.reply_text("Сколько матчей ты сыграл в этом и прошлом сезоне?")
     return MATCHES
 
 # Получение матчей
 async def matches(update: Update, context: CallbackContext) -> int:
-    if not update.message.text.isdigit():
-        await update.message.reply_text("Количество матчей должно быть числом. Пожалуйста, попробуй снова.")
-        return MATCHES
-    
     context.user_data['matches'] = update.message.text
-
+    
     # Создаём сообщение с заявкой
     application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
                   f"Игровой ник: {context.user_data['nickname']}\n" \
@@ -104,11 +60,6 @@ async def matches(update: Update, context: CallbackContext) -> int:
 async def cancel(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Заявка отменена.")
     return ConversationHandler.END
-
-# Функция возврата на старт
-async def back_start(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text("Заявка отменена. Начнем сначала.")
-    return start(update, context)
 
 # Основная функция
 def main() -> None:

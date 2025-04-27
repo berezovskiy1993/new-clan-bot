@@ -40,13 +40,13 @@ async def gender(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Пожалуйста, напиши 'девочка' или 'парень'.")
         return GENDER
     context.user_data['gender'] = gender
-    await update.message.reply_text("Какая у тебя КД за текущий сезон?")
+    await update.message.reply_text("Какой у тебя КД за текущий сезон?")
     return KD_CURRENT
 
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_current'] = update.message.text
-    await update.message.reply_text("А какая у тебя КД за прошлый сезон?")
+    await update.message.reply_text("Какой у тебя КД за прошлый сезон?")
     return KD_PREVIOUS
 
 # Получение КД за прошлый сезон

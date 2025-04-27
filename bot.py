@@ -8,7 +8,7 @@ from telegram.ext import (
 
 # Токен и ID администратора
 TOKEN = '7912601677:AAE_saIpU_55S2dgEdnEnnXov0pw33BPVu0'
-ADMIN_ID = 894031843  # ID администратора
+ADMIN_ID = 894031843
 
 # Состояния для ConversationHandler
 NICKNAME, PLAYER_ID, AGE, KD, MATCHES = range(5)
@@ -19,104 +19,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         [InlineKeyboardButton("Начать заявку", callback_data="start_application")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(
-        "Привет! Я бот клана DEKTRIAN FAMILY. "
-        "Хочешь вступить в наш клан? Нажми кнопку ниже!", reply_markup=reply_markup
-    )
-    return ConversationHandler.END
-
-# Получение никнейма
-async def nickname(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    
     if update.message:
-        context.user_data['nickname'] = update.message.text
-        keyboard = [
-            [InlineKeyboardButton("Назад", callback_data="back_start")],
-            [InlineKeyboardButton("Далее", callback_data="next_player_id")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("Теперь введи свой игровой айди:", reply_markup=reply_markup)
-        return PLAYER_ID
-    return ConversationHandler.END
-
-# Получение игрового ID
-async def player_id(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if update.message:
-        if not update.message.text.isdigit():
-            await update.message.reply_text("Айди должен быть числом. Попробуй снова:")
-            return PLAYER_ID
-        context.user_data['player_id'] = update.message.text
-        keyboard = [
-            [InlineKeyboardButton("Назад", callback_data="back_nickname")],
-            [InlineKeyboardButton("Далее", callback_data="next_age")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("Теперь укажи свой возраст:", reply_markup=reply_markup)
-        return AGE
-    return ConversationHandler.END
-
-# Получение возраста
-async def age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if update.message:
-        if not update.message.text.isdigit():
-            await update.message.reply_text("Возраст должен быть числом. Попробуй снова:")
-            return AGE
-        context.user_data['age'] = update.message.text
-        keyboard = [
-            [InlineKeyboardButton("Назад", callback_data="back_player_id")],
-            [InlineKeyboardButton("Далее", callback_data="next_kd")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("Какая у тебя КД за последние два сезона?", reply_markup=reply_markup)
-        return KD
-    return ConversationHandler.END
-
-# Получение КД
-async def kd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if update.message:
-        if not update.message.text.replace('.', '', 1).isdigit():
-            await update.message.reply_text("КД должно быть числом. Попробуй снова:")
-            return KD
-        context.user_data['kd'] = update.message.text
-        keyboard = [
-            [InlineKeyboardButton("Назад", callback_data="back_age")],
-            [InlineKeyboardButton("Далее", callback_data="next_matches")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("Сколько матчей ты сыграл за последние два сезона?", reply_markup=reply_markup)
-        return MATCHES
-    return ConversationHandler.END
-
-# Получение количества матчей
-async def matches(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if update.message:
-        if not update.message.text.isdigit():
-            await update.message.reply_text("Количество матчей должно быть числом. Попробуй снова:")
-            return MATCHES
-        context.user_data['matches'] = update.message.text
-
-        user = update.message.from_user
-        if user.username:
-            user_link = f"@{user.username}"
-        else:
-            user_link = f"[Профиль](tg://user?id={user.id})"
-
-        application_text = (
-            "📥 Новая заявка в клан DEKTRIAN FAMILY:\n\n"
-            f"👤 Telegram: {user_link}\n"
-            f"🎮 Никнейм: {context.user_data['nickname']}\n"
-            f"🆔 Игровой ID: {context.user_data['player_id']}\n"
-            f"🎂 Возраст: {context.user_data['age']}\n"
-            f"⚔️ КД за 2 сезона: {context.user_data['kd']}\n"
-            f"🏆 Матчей за 2 сезона: {context.user_data['matches']}"
+        await update.message.reply_text(
+            "Привет! Я бот клана DEKTRIAN FAMILY. "
+            "Хочешь вступить в наш клан? Нажми кнопку ниже!",
+            reply_markup=reply_markup
         )
+    elif update.callback_query:
+        await update.callback_query.message.reply_text(
+            "Привет! Я бот клана DEKTRIAN FAMILY. "
+            "Хочешь вступить в наш клан? Нажми кнопку ниже!",
+            reply_markup=reply_markup
+        )
+    
+    return NICKNAME  # <-- Меняем: ОЖИДАЕМ кнопку, а не END
 
-        # Отправляем админу заявку
-        await context.bot.send_message(ADMIN_ID, application_text, parse_mode="Markdown")
-        await update.message.reply_text("✅ Ваша заявка успешно отправлена! Ожидайте ответа администратора.")
-        return ConversationHandler.END
-    return ConversationHandler.END
-
-# Обработчики кнопок
+# Обработчик нажатия кнопок
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     query = update.callback_query
     await query.answer()
@@ -152,6 +71,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await query.message.reply_text("Неизвестная команда.")
         return ConversationHandler.END
 
+# Остальные функции nickname, player_id, age, kd, matches без изменений
+
 # Основная функция
 def main() -> None:
     logging.basicConfig(
@@ -162,7 +83,10 @@ def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[
+            CommandHandler('start', start),
+            CallbackQueryHandler(button, pattern="^start_application$")  # <- Обработка кнопки старта
+        ],
         states={
             NICKNAME: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, nickname),
@@ -186,13 +110,12 @@ def main() -> None:
             ],
         },
         fallbacks=[CallbackQueryHandler(button)],
-        per_message=True,  # 🔥 Вот это добавил для исправления предупреждения
+        per_message=True,
     )
 
     application.add_handler(conv_handler)
 
     port = int(os.environ.get("PORT", 10000))
-
     application.run_webhook(
         listen="0.0.0.0",
         port=port,

@@ -93,6 +93,10 @@ async def matches_current(update: Update, context: CallbackContext) -> int:
 async def matches_previous(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_previous'] = update.message.text
     
+    # Получаем юзернейм и айди пользователя Telegram
+    telegram_username = update.message.from_user.username
+    telegram_user_id = update.message.from_user.id
+    
     # Формируем заявку
     application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
                   f"Игровой ник: {context.user_data['nickname']}\n" \
@@ -102,7 +106,9 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
                   f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
                   f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
                   f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
-                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n"
+                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
+                  f"Telegram Username: @{telegram_username}\n" \
+                  f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
 
     # Отправляем заявку админу и группе
     try:

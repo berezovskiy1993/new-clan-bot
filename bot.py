@@ -8,7 +8,7 @@ ADMIN_ID = 894031843  # ID администратора
 GROUP_ID = -1002640250280  # ID закрытой группы
 
 # Состояния для ConversationHandler
-READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2 = range(10)
+READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2 = range(11)
 
 # Функция для создания кнопок "Начать с начала" и "Критерии"
 def get_buttons():
@@ -191,6 +191,23 @@ async def reset(update: Update, context: CallbackContext) -> int:
 # Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
+    if query.data == 'reset':
+        return reset(update, context)
+
+# Основная функция для запуска бота
+def main():
+    application = Application.builder().token(TOKEN).build()
+
+    conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            READY: [MessageHandler(filters.TEXT & ~filters.COMMAND, ready)],
+            NICKNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, nickname)],
+            PLAYER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, player_id)],
+            AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
+            GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender)],
+            KD_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_current)],
+            KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
+            MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
+            MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
+            SCREENSHOT_1

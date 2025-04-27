@@ -1,5 +1,5 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext, CallbackQueryHandler
 import os
 
 # Токен и ID администратора
@@ -128,6 +128,13 @@ async def reset(update: Update, context: CallbackContext) -> int:
     )
     return NICKNAME
 
+# Функция для обработки нажатия на кнопку сброса (callback query)
+async def button_callback(update: Update, context: CallbackContext):
+    query = update.callback_query
+    if query.data == 'reset':  # Проверяем callback_data
+        # Выполняем сброс данных
+        return await reset(update, context)
+
 # Функция для отмены
 async def cancel(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Заявка отменена.")
@@ -149,7 +156,7 @@ def main() -> None:
             MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
             MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
         },
-        fallbacks=[CommandHandler('cancel', cancel), CommandHandler('reset', reset)],
+        fallbacks=[CommandHandler('cancel', cancel), CallbackQueryHandler(button_callback)],
     )
 
     application.add_handler(conversation_handler)

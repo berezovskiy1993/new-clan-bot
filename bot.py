@@ -227,24 +227,30 @@ def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
     conversation_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={
-            READY: [MessageHandler(filters.TEXT & ~filters.COMMAND, ready)],
-            NICKNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, nickname)],
-            PLAYER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, player_id)],
-            AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
-            GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender)],
-            KD_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_current)],
-            KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
-            MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
-            MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
-        },
-        fallbacks=[CommandHandler('cancel', cancel), CallbackQueryHandler(button_callback)],
-    )
+    entry_points=[CommandHandler('start', start)],  # точка начала
+    states={
+        READY: [MessageHandler(filters.TEXT & ~filters.COMMAND, ready)],  # Ответ на 'да' или 'нет'
+        NICKNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, nickname)],
+        PLAYER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, player_id)],
+        AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
+        GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender)],
+        KD_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_current)],
+        KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
+        MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
+        MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],  # Убедитесь, что это 9
+        SCREENSHOT_1: [MessageHandler(filters.PHOTO, screenshot_1)],
+        SCREENSHOT_2: [MessageHandler(filters.PHOTO, screenshot_2)],  # Новый шаг для второго скриншота
+    },
+    fallbacks=[]  # Если нужно обработать ошибки или завершение процесса
+)
 
-    application.add_handler(conversation_handler)
+    # Создание приложения и добавление обработчиков
+application = Application.builder().token(TOKEN).build()
 
     port = int(os.environ.get("PORT", 10000))
+
+# Добавляем обработчик
+application.add_handler(conversation_handler)
 
     application.run_webhook(
         listen="0.0.0.0",  

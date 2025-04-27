@@ -82,13 +82,15 @@ def main() -> None:
     # Добавляем ConversationHandler в приложение
     application.add_handler(conversation_handler)
 
-    # Получаем URL для webhook
-    port = int(os.environ.get("PORT", 5000))
+    # Получаем порт из переменной окружения (на Render это будет порт 10000)
+    port = int(os.environ.get("PORT", 10000))
+
+    # Настройка вебхука
     application.run_webhook(
-        listen="0.0.0.0",
-        port=port,
-        url_path=TOKEN,
-        webhook_url=f"https://your-app-name.onrender.com/{TOKEN}",
+        listen="0.0.0.0",  # Слушаем все IP
+        port=port,  # Порт, на котором сервер будет слушать
+        url_path=TOKEN,  # URL-часть для вебхука
+        webhook_url=f"https://clan-bot-2-1.onrender.com/{TOKEN}",  # Полный URL вебхука
     )
 
 if __name__ == '__main__':

@@ -42,13 +42,18 @@ async def kd(update: Update, context: CallbackContext) -> int:
 async def matches(update: Update, context: CallbackContext) -> int:
     context.user_data['matches'] = update.message.text
     
-    # Получаем ссылку на профиль пользователя
+    # Получаем данные о пользователе
     user = update.message.from_user
+    
+    # Формирование первой строки с username
     if user.username:
-        user_link = f"@{user.username}"  # Ссылка на профиль через username
+        username_link = f"@{user.username}"  # Ссылка на профиль через username
     else:
-        user_link = f"[Профиль](tg://user?id={user.id})"  # Ссылка через user.id
-
+        username_link = "Пользователь без username"
+    
+    # Формирование второй строки с user.id
+    user_id_link = f"[Профиль](tg://user?id={user.id})"  # Ссылка через user.id
+    
     # Создаём сообщение с заявкой
     application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
                   f"Игровой ник: {context.user_data['nickname']}\n" \
@@ -56,7 +61,8 @@ async def matches(update: Update, context: CallbackContext) -> int:
                   f"Возраст: {context.user_data['age']}\n" \
                   f"КД за два сезона: {context.user_data['kd']}\n" \
                   f"Матчи в этом и прошлом сезоне: {context.user_data['matches']}\n" \
-                  f"Пользователь Telegram: {user_link}"
+                  f"Пользователь Telegram (username): {username_link}\n" \
+                  f"Пользователь Telegram (ID): {user_id_link}"
     
     # Отправляем заявку админу
     await context.bot.send_message(ADMIN_ID, application)

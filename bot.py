@@ -247,7 +247,7 @@ def main() -> None:
     # Создание приложения и добавление обработчиков
 application = Application.builder().token(TOKEN).build()
 
-    port = int(os.environ.get("PORT", 10000))
+port = int(os.environ.get("PORT", 10000))
 
 # Добавляем обработчик
 application.add_handler(conversation_handler)

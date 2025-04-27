@@ -191,4 +191,4 @@ async def reset(update: Update, context: CallbackContext) -> int:
 # Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
-    if query.data == 'reset
+    if query.data == 'reset':

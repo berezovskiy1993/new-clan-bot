@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext
+import os
 
 # Токен и ID администратора
 TOKEN = '7912601677:AAE_saIpU_55S2dgEdnEnnXov0pw33BPVu0'
@@ -81,8 +82,14 @@ def main() -> None:
     # Добавляем ConversationHandler в приложение
     application.add_handler(conversation_handler)
 
-    # Запускаем бота без asyncio.run()
-    application.run_polling()
+    # Получаем URL для webhook
+    port = int(os.environ.get("PORT", 5000))
+    application.run_webhook(
+        listen="0.0.0.0",
+        port=port,
+        url_path=TOKEN,
+        webhook_url=f"https://your-app-name.onrender.com/{TOKEN}",
+    )
 
 if __name__ == '__main__':
     main()

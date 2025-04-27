@@ -135,48 +135,46 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
-       
-  # Получаем юзернейм и айди пользователя Telegram
+        
+        # Получаем юзернейм и айди пользователя Telegram
         telegram_username = update.message.from_user.username
         telegram_user_id = update.message.from_user.id        
-    
-    # Формируем заявку
-    application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
-                  f"Игровой ник: {context.user_data['nickname']}\n" \
-                  f"Игровой айди: {context.user_data['player_id']}\n" \
-                  f"Возраст: {context.user_data['age']}\n" \
-                  f"Пол: {context.user_data['gender']}\n" \
-                  f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
-                  f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
-                  f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
-                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
-                  f"Telegram Username: @{telegram_username}\n" \
-                  f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
+        
+        # Формируем заявку
+        application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
+                      f"Игровой ник: {context.user_data['nickname']}\n" \
+                      f"Игровой айди: {context.user_data['player_id']}\n" \
+                      f"Возраст: {context.user_data['age']}\n" \
+                      f"Пол: {context.user_data['gender']}\n" \
+                      f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
+                      f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
+                      f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
+                      f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
+                      f"Telegram Username: @{telegram_username}\n" \
+                      f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
 
-    # Отправляем заявку админу и группе
-    try:
-        await context.bot.send_message(ADMIN_ID, application)
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при отправке сообщения админу: {e}")
-    
-    try:
-        await context.bot.send_message(GROUP_ID, application)
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
+        # Отправляем заявку админу и группе
+        try:
+            await context.bot.send_message(ADMIN_ID, application)
+            await context.bot.send_message(GROUP_ID, application)
+        except Exception as e:
+            await update.message.reply_text(f"Ошибка при отправке сообщения: {e}")
 
-# Отправка скриншотов
+        # Отправка скриншотов
         try:
             await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_1'])
             await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_2'])
+            await context.bot.send_photo(GROUP_ID, photo=context.user_data['screenshot_1'])
+            await context.bot.send_photo(GROUP_ID, photo=context.user_data['screenshot_2'])
         except Exception as e:
             await update.message.reply_text(f"Ошибка при отправке скриншотов: {e}")
 
-
-    # Уведомление для пользователя
-    await update.message.reply_text(
-        "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
-        reply_markup=get_buttons()  # Добавляем кнопки
-    )
+        # Уведомление для пользователя
+        await update.message.reply_text(
+            "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
+            reply_markup=get_buttons()  # Добавляем кнопки
+        )
+        
     return ConversationHandler.END
 
 # Функция для сброса данных

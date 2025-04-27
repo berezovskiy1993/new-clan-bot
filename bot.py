@@ -198,4 +198,15 @@ def main() -> None:
             PLAYER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, player_id)],
             AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
             GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender)],
-            KD_CURRENT: [MessageHandler(filters.TEXT
+            KD_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_current)],
+            KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
+            MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
+            MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel), CallbackQueryHandler(button_callback)],
+    )
+
+    application.add_handler(conversation_handler)
+
+    port = int(os.environ.get("PORT", 10000))
+

@@ -33,13 +33,9 @@ async def age(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Ты девочка или парень? Напиши 'девочка' или 'парень'.")
     return GENDER
 
-# Получение пола
+# Получение пола (без проверки)
 async def gender(update: Update, context: CallbackContext) -> int:
-    gender = update.message.text.lower()
-    if gender not in ['девочка', 'парень']:
-        await update.message.reply_text("Пожалуйста, напиши 'девочка' или 'парень'.")
-        return GENDER
-    context.user_data['gender'] = gender
+    context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text("Какая у тебя КД за текущий сезон?")
     return KD_CURRENT
 
@@ -100,8 +96,14 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
 
     # Уведомление для пользователя
-    await update.message.reply_text("Ваша заявка отправлена, Спасибо! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.")
+    await update.message.reply_text("Ваша заявка отправлена! Спасибо, что подали её!")
     return ConversationHandler.END
+
+# Функция для сброса данных и начала подачи заявки с самого начала
+async def reset(update: Update, context: CallbackContext) -> int:
+    context.user_data.clear()  # Очищаем все данные пользователя
+    await update.message.reply_text("Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!")
+    return NICKNAME
 
 # Функция для отмены
 async def cancel(update: Update, context: CallbackContext) -> int:
@@ -126,7 +128,7 @@ def main() -> None:
             MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
             MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
         },
-        fallbacks=[CommandHandler('cancel', cancel)],
+        fallbacks=[CommandHandler('cancel', cancel), CommandHandler('reset', reset)],
     )
 
     # Добавляем ConversationHandler в приложение

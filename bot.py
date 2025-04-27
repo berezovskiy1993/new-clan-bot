@@ -40,13 +40,13 @@ async def gender(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Пожалуйста, напиши 'девочка' или 'парень'.")
         return GENDER
     context.user_data['gender'] = gender
-    await update.message.reply_text("Какой у тебя КД за текущий сезон?")
+    await update.message.reply_text("Какая у тебя КД за текущий сезон?")
     return KD_CURRENT
 
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_current'] = update.message.text
-    await update.message.reply_text("Какой у тебя КД за прошлый сезон?")
+    await update.message.reply_text("А какая у тебя КД за прошлый сезон?")
     return KD_PREVIOUS
 
 # Получение КД за прошлый сезон
@@ -70,6 +70,9 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
     
     # Формирование ссылки на профиль пользователя (с помощью ID, который кликабелен)
     user_id_link = f"tg://user?id={user.id}"  # Ссылка через user.id (будет работать в мобильном приложении)
+    
+    # Получение юзернейма
+    username = user.username if user.username else "Не указан"
 
     # Создаём сообщение с заявкой
     application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
@@ -81,8 +84,9 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
                   f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
                   f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
                   f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
-                  f"Пользователь Telegram (ID): [Профиль]({user_id_link})"
-    
+                  f"Пользователь Telegram (ID): [Профиль]({user_id_link})\n" \
+                  f"Юзернейм: @{username}"
+
     # Отправляем заявку админу
     try:
         await context.bot.send_message(ADMIN_ID, application)

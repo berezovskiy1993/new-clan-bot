@@ -183,4 +183,12 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
 async def reset(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()  # Очищаем все данные пользователя
     await update.callback_query.message.edit_text(
-        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм
+        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
+        reply_markup=get_buttons()  # Кнопка сброса
+    )
+    return NICKNAME
+
+# Функция для обработки нажатия на кнопку сброса и критериев
+async def button_callback(update: Update, context: CallbackContext):
+    query = update.callback_query
+    if query.data == 'reset

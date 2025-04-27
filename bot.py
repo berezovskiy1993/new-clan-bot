@@ -186,6 +186,7 @@ def main() -> None:
             ],
         },
         fallbacks=[CallbackQueryHandler(button)],
+        per_message=True,  # 🔥 Вот это добавил для исправления предупреждения
     )
 
     application.add_handler(conv_handler)

@@ -5,6 +5,7 @@ import os
 # Токен и ID администратора
 TOKEN = '7912601677:AAE_saIpU_55S2dgEdnEnnXov0pw33BPVu0'
 ADMIN_ID = 894031843  # ID администратора
+GROUP_ID = -1002640250280  # ID закрытой группы
 
 # Состояния для ConversationHandler
 NICKNAME, PLAYER_ID, AGE, KD, MATCHES = range(5)
@@ -66,6 +67,9 @@ async def matches(update: Update, context: CallbackContext) -> int:
     
     # Отправляем заявку админу
     await context.bot.send_message(ADMIN_ID, application)
+    
+    # Отправляем заявку в закрытую группу
+    await context.bot.send_message(GROUP_ID, application)
 
     # Уведомление для пользователя
     await update.message.reply_text("Ваша заявка отправлена! Спасибо, что подали её!")

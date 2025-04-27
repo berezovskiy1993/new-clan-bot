@@ -118,71 +118,69 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
 
 # Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
-    context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
-    await update.message.reply_text(
-        "Теперь отправь второй скриншот из игры.",
-        reply_markup=get_buttons()  # Добавляем кнопки
-    )
-    return SCREENSHOT_2
+    if update.message.photo:
+        context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
+        await update.message.reply_text(
+            "Теперь отправь второй скриншот из игры.",
+            reply_markup=get_buttons()  # Добавляем кнопки
+        )
+        return SCREENSHOT_2
+    else:
+        await update.message.reply_text("Пожалуйста, отправьте скриншот.")
+        return SCREENSHOT_1
 
 # Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
-    context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
-    
-    # Получаем юзернейм и айди пользователя Telegram
-    telegram_username = update.message.from_user.username
-    telegram_user_id = update.message.from_user.id
-    
-    # Формируем заявку
-    application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
-                  f"Игровой ник: {context.user_data['nickname']}\n" \
-                  f"Игровой айди: {context.user_data['player_id']}\n" \
-                  f"Возраст: {context.user_data['age']}\n" \
-                  f"Пол: {context.user_data['gender']}\n" \
-                  f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
-                  f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
-                  f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
-                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
-                  f"Telegram Username: @{telegram_username}\n" \
-                  f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
+    if update.message.photo:
+        context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
+        
+        # Получаем юзернейм и айди пользователя Telegram
+        telegram_username = update.message.from_user.username
+        telegram_user_id = update.message.from_user.id
+        
+        # Формируем заявку
+        application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
+                      f"Игровой ник: {context.user_data['nickname']}\n" \
+                      f"Игровой айди: {context.user_data['player_id']}\n" \
+                      f"Возраст: {context.user_data['age']}\n" \
+                      f"Пол: {context.user_data['gender']}\n" \
+                      f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
+                      f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
+                      f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
+                      f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
+                      f"Telegram Username: @{telegram_username}\n" \
+                      f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
 
-    # Отправляем заявку админу и группе
-    try:
-        await context.bot.send_message(ADMIN_ID, application)
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при отправке сообщения админу: {e}")
-    
-    try:
-        await context.bot.send_message(GROUP_ID, application)
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
+        # Отправляем заявку админу и группе
+        try:
+            await context.bot.send_message(ADMIN_ID, application)
+        except Exception as e:
+            await update.message.reply_text(f"Ошибка при отправке сообщения админу: {e}")
+        
+        try:
+            await context.bot.send_message(GROUP_ID, application)
+        except Exception as e:
+            await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
 
-    # Отправка скриншотов
-    try:
-        await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_1'])
-        await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_2'])
-    except Exception as e:
-        await update.message.reply_text(f"Ошибка при отправке скриншотов: {e}")
+        # Отправка скриншотов
+        try:
+            await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_1'])
+            await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_2'])
+        except Exception as e:
+            await update.message.reply_text(f"Ошибка при отправке скриншотов: {e}")
 
-    # Уведомление для пользователя
-    await update.message.reply_text(
-        "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
-        reply_markup=get_buttons()  # Добавляем кнопки
-    )
-    return ConversationHandler.END
+        # Уведомление для пользователя
+        await update.message.reply_text(
+            "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
+            reply_markup=get_buttons()  # Добавляем кнопки
+        )
+        return ConversationHandler.END
+    else:
+        await update.message.reply_text("Пожалуйста, отправьте второй скриншот.")
+        return SCREENSHOT_2
 
 # Функция для сброса данных
 async def reset(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()  # Очищаем все данные пользователя
     await update.callback_query.message.edit_text(
-        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
-        reply_markup=get_buttons()  # Кнопка сброса
-    )
-    return NICKNAME
-
-# Функция для обработки нажатия на кнопку сброса и критериев
-async def button_callback(update: Update, context: CallbackContext):
-    query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context
+        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм

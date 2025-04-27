@@ -8,7 +8,7 @@ ADMIN_ID = 894031843  # ID администратора
 GROUP_ID = -1002640250280  # ID закрытой группы
 
 # Состояния для ConversationHandler
-NICKNAME, PLAYER_ID, AGE, KD, MATCHES = range(5)
+NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS = range(8)
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
@@ -30,46 +30,70 @@ async def player_id(update: Update, context: CallbackContext) -> int:
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
     context.user_data['age'] = update.message.text
-    await update.message.reply_text("Какая у тебя КД за последние два сезона?")
-    return KD
+    await update.message.reply_text("Ты девочка или парень? Напиши 'девочка' или 'парень'.")
+    return GENDER
 
-# Получение КД
-async def kd(update: Update, context: CallbackContext) -> int:
-    context.user_data['kd'] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в этом и прошлом сезоне?")
-    return MATCHES
+# Получение пола
+async def gender(update: Update, context: CallbackContext) -> int:
+    gender = update.message.text.lower()
+    if gender not in ['девочка', 'парень']:
+        await update.message.reply_text("Пожалуйста, напиши 'девочка' или 'парень'.")
+        return GENDER
+    context.user_data['gender'] = gender
+    await update.message.reply_text("Какая у тебя КД за текущий сезон?")
+    return KD_CURRENT
 
-# Получение матчей
-async def matches(update: Update, context: CallbackContext) -> int:
-    context.user_data['matches'] = update.message.text
+# Получение КД за текущий сезон
+async def kd_current(update: Update, context: CallbackContext) -> int:
+    context.user_data['kd_current'] = update.message.text
+    await update.message.reply_text("А какая у тебя КД за прошлый сезон?")
+    return KD_PREVIOUS
+
+# Получение КД за прошлый сезон
+async def kd_previous(update: Update, context: CallbackContext) -> int:
+    context.user_data['kd_previous'] = update.message.text
+    await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?")
+    return MATCHES_CURRENT
+
+# Получение матчей за текущий сезон
+async def matches_current(update: Update, context: CallbackContext) -> int:
+    context.user_data['matches_current'] = update.message.text
+    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?")
+    return MATCHES_PREVIOUS
+
+# Получение матчей за прошлый сезон
+async def matches_previous(update: Update, context: CallbackContext) -> int:
+    context.user_data['matches_previous'] = update.message.text
     
     # Получаем данные о пользователе
     user = update.message.from_user
     
-    # Формирование первой строки с username
-    if user.username:
-        username_link = f"@{user.username}"  # Ссылка на профиль через username
-    else:
-        username_link = "Пользователь без username"
-    
-    # Формирование второй строки с user.id
-    user_id_link = f"[Профиль](tg://user?id={user.id})"  # Ссылка через user.id
-    
+    # Формирование ссылки на профиль пользователя (с помощью ID, который кликабелен)
+    user_id_link = f"tg://user?id={user.id}"  # Ссылка через user.id (будет работать в мобильном приложении)
+
     # Создаём сообщение с заявкой
     application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
                   f"Игровой ник: {context.user_data['nickname']}\n" \
                   f"Игровой айди: {context.user_data['player_id']}\n" \
                   f"Возраст: {context.user_data['age']}\n" \
-                  f"КД за два сезона: {context.user_data['kd']}\n" \
-                  f"Матчи в этом и прошлом сезоне: {context.user_data['matches']}\n" \
-                  f"Пользователь Telegram (username): {username_link}\n" \
-                  f"Пользователь Telegram (ID): {user_id_link}"
+                  f"Пол: {context.user_data['gender']}\n" \
+                  f"КД за текущий сезон: {context.user_data['kd_current']}\n" \
+                  f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
+                  f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n" \
+                  f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
+                  f"Пользователь Telegram (ID): [Профиль]({user_id_link})"
     
     # Отправляем заявку админу
-    await context.bot.send_message(ADMIN_ID, application)
-    
+    try:
+        await context.bot.send_message(ADMIN_ID, application)
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка при отправке сообщения админу: {e}")
+
     # Отправляем заявку в закрытую группу
-    await context.bot.send_message(GROUP_ID, application)
+    try:
+        await context.bot.send_message(GROUP_ID, application)
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка при отправке сообщения в группу: {e}")
 
     # Уведомление для пользователя
     await update.message.reply_text("Ваша заявка отправлена! Спасибо, что подали её!")
@@ -92,8 +116,11 @@ def main() -> None:
             NICKNAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, nickname)],
             PLAYER_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, player_id)],
             AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
-            KD: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd)],
-            MATCHES: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches)],
+            GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender)],
+            KD_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_current)],
+            KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
+            MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
+            MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )

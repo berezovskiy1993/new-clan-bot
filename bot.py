@@ -178,13 +178,17 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         
     return ConversationHandler.END
 
-# Функция для сброса данных
+# Функция для жесткого сброса данных при отмене
 async def cancel(update: Update, context: CallbackContext) -> int:
-    # Отправляем сообщение о сбросе
+    # Сбрасываем все данные пользователя
+    context.user_data.clear()
+
+    # Отправляем сообщение о сбросе данных
     await update.callback_query.message.edit_text(
         "Процесс подачи заявки отменен. Начни сначала, введя свой игровой никнейм.",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
+
     # Возвращаем в начало процесса
     return NICKNAME
 

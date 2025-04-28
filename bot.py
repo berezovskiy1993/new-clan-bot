@@ -73,10 +73,15 @@ async def button_callback(update: Update, context: CallbackContext):
         )
         await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
     elif query.data == 'restart':
-        # Функция для начала процесса заново
-        context.user_data.clear()  # Очищаем все данные пользователя
-        await query.message.edit_text("Давай начнем с самого начала! Напиши 'да' для подачи заявки.",
-                                      reply_markup=get_buttons())  # Кнопки снова будут на экране
+        # Функция для полного рестарта бота
+        await query.message.edit_text("Перезапускаю процесс... Пожалуйста, подождите.",
+                                      reply_markup=None)  # Убираем кнопки
+
+        # Очищаем все данные пользователя
+        context.user_data.clear()
+
+        # Начинаем процесс заново
+        await start(update, context)  # Перезапускаем с начала
         return READY
 
 # Функция для отмены

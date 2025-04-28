@@ -13,7 +13,8 @@ READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURREN
 # Функция для создания кнопок "Критерии"
 def get_buttons():
     keyboard = [
-        [InlineKeyboardButton("Критерии", callback_data='criteria')]
+        [InlineKeyboardButton("Критерии", callback_data='criteria')],
+        [InlineKeyboardButton("Начать заново", callback_data='restart')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -194,12 +195,22 @@ async def button_callback(update: Update, context: CallbackContext):
             "4. Преемущество отдается собранным пакам\n"
         )
         await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
+    elif query.data == 'restart':
+        # Функция для начала процесса заново
+        context.user_data.clear()  # Очищаем все данные пользователя
+        await query.message.edit_text("Вы начали заново. Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.", reply_markup=get_buttons()) 
+        return READY  # Возвращаем в начальную точку
     return
 
-# Функция для отмены
-async def cancel(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_text("Заявка отменена.")
-    return ConversationHandler.END
+# Функция для обработки нажатия на кнопку "Начать заново"
+async def restart(update: Update, context: CallbackContext) -> int:
+    # Очищаем все данные пользователя
+    context.user_data.clear()
+    await update.message.reply_text(
+        "Вы начали заново. Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
+    )
+    return READY  # Возвращаем в начальную точку
 
 # Основная функция
 def main() -> None:

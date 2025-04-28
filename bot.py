@@ -10,10 +10,9 @@ GROUP_ID = -1002640250280  # ID закрытой группы
 # Состояния для ConversationHandler
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2 = range(11)
 
-# Функция для создания кнопок "Начать с начала" и "Критерии"
+# Функция для создания кнопок "Критерии"
 def get_buttons():
     keyboard = [
-        [InlineKeyboardButton("Начать с начала", callback_data='reset')],
         [InlineKeyboardButton("Критерии", callback_data='criteria')]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -27,7 +26,7 @@ async def start(update: Update, context: CallbackContext) -> int:
     )
     await update.message.reply_text(
         "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
-        reply_markup=get_buttons()  # Добавляем две кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return READY
 
@@ -49,7 +48,7 @@ async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
         "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return PLAYER_ID
 
@@ -58,7 +57,7 @@ async def player_id(update: Update, context: CallbackContext) -> int:
     context.user_data['player_id'] = update.message.text
     await update.message.reply_text(
         "Сколько тебе полных лет?",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return AGE
 
@@ -67,7 +66,7 @@ async def age(update: Update, context: CallbackContext) -> int:
     context.user_data['age'] = update.message.text
     await update.message.reply_text(
         "Ты девочка или парень?",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return GENDER
 
@@ -76,7 +75,7 @@ async def gender(update: Update, context: CallbackContext) -> int:
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return KD_CURRENT
 
@@ -85,7 +84,7 @@ async def kd_current(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_current'] = update.message.text
     await update.message.reply_text(
         "Какой у тебя КД за прошлый сезон?",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return KD_PREVIOUS
 
@@ -94,7 +93,7 @@ async def kd_previous(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_previous'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в текущем сезоне?",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return MATCHES_CURRENT
 
@@ -103,7 +102,7 @@ async def matches_current(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_current'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в прошлом сезоне?",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return MATCHES_PREVIOUS
 
@@ -112,7 +111,7 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_previous'] = update.message.text
     await update.message.reply_text(
         "Пожалуйста, отправь скриншот статистики из игры за текущий сезон.",
-        reply_markup=get_buttons()  # Добавляем кнопки
+        reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
     )
     return SCREENSHOT_1
 
@@ -122,7 +121,7 @@ async def screenshot_1(update: Update, context: CallbackContext) -> int:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id
         await update.message.reply_text(
             "Теперь отправь скриншот статистики из игры за прошлый сезон.",
-            reply_markup=get_buttons()  # Добавляем кнопки
+            reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
         )
         return SCREENSHOT_2
     else:
@@ -165,36 +164,16 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
 
         await update.message.reply_text(
             "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
-            reply_markup=get_buttons()  # Добавляем кнопки
+            reply_markup=get_buttons()  # Добавляем кнопку "Критерии"
         )
         
     return ConversationHandler.END
 
-# Функция для сброса данных и перенаправления к начальной кнопке
-async def reset(update: Update, context: CallbackContext) -> int:
-    context.user_data.clear()  # Очищаем все данные пользователя
-    
-    message = update.callback_query.message
-    
-    # Проверяем, отличается ли текст или кнопки от уже отображающихся
-    if message.text != "Все данные были сброшены. Начни процесс подачи заявки заново, нажав на кнопку 'Старт'." or \
-       message.reply_markup != get_buttons():
-        await message.edit_text(
-            "Все данные были сброшены. Начни процесс подачи заявки заново, нажав на кнопку 'Старт'.",
-            reply_markup=get_buttons()  # Кнопка "Старт"
-        )
-    
-    return READY  # Переходим в состояние "READY"
-
-# Функция для обработки нажатия на кнопку сброса и критериев
+# Функция для обработки нажатия на кнопку "Критерии"
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
-    elif query.data == 'criteria':
-
-              # Показ критериев клана
+    if query.data == 'criteria':
+        # Показ критериев клана
         criteria_text = (
             "Критерии клана DEKTRIAN FAMILY:\n"
             "1. Смена тега в течении 7 дней.\n"
@@ -241,7 +220,7 @@ def main() -> None:
             SCREENSHOT_1: [MessageHandler(filters.PHOTO, screenshot_1)],
             SCREENSHOT_2: [MessageHandler(filters.PHOTO, screenshot_2)],  # Новый шаг для второго скриншота
         },
-        fallbacks=[]  # Если нужно обработать ошибки или завершение процесса
+        fallbacks=[CommandHandler('cancel', cancel)]  # Обработчик для команды отмены
     )
 
     # Обработчик коллбэков для кнопок
@@ -260,4 +239,3 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-

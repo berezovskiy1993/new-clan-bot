@@ -10,11 +10,15 @@ GROUP_ID = -1002640250280  # ID закрытой группы
 # Состояния для ConversationHandler
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2 = range(11)
 
-# Функция для создания кнопок "Отмена" и "Критерии"
+# Список админов клана
+ADMINS = ["@Admin1", "@Admin2", "@Admin3"]  # Замените на реальные никнеймы админов
+
+# Функция для создания кнопок
 def get_buttons():
     keyboard = [
         [InlineKeyboardButton("Отмена", callback_data='reset')],
-        [InlineKeyboardButton("Критерии", callback_data='criteria')]
+        [InlineKeyboardButton("Критерии", callback_data='criteria')],
+        [InlineKeyboardButton("Админы", callback_data='admins')]  # Кнопка для отображения списка админов
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -186,7 +190,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     )
     return NICKNAME  # Возвращаем пользователя на ввод никнейма
 
-# Функция для обработки нажатия на кнопку сброса и критериев
+# Функция для обработки нажатия на кнопку сброса, критериев и админов
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset':  # Проверяем callback_data
@@ -213,6 +217,9 @@ async def button_callback(update: Update, context: CallbackContext):
             "4. Преемущество отдается собранным пакам\n"            
         )
         await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
+    elif query.data == 'admins':  # Кнопка для показа списка админов
+        admins_text = "Список админов клана:\n" + "\n".join(ADMINS)
+        await query.message.edit_text(admins_text, reply_markup=get_buttons())  # Показываем список админов
     return
 
 # Основная функция

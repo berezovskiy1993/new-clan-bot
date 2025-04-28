@@ -14,7 +14,8 @@ READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURREN
 def get_buttons():
     keyboard = [
         [InlineKeyboardButton("Назад", callback_data='back')],
-        [InlineKeyboardButton("Критерии", callback_data='criteria')]
+        [InlineKeyboardButton("Критерии", callback_data='criteria')],
+        [InlineKeyboardButton("Ресет", callback_data='reset')]  # Добавлена кнопка сброса
     ]
     return InlineKeyboardMarkup(keyboard)
 

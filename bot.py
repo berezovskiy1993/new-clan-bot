@@ -8,12 +8,12 @@ ADMIN_ID = 894031843  # ID администратора
 GROUP_ID = -1002640250280  # ID закрытой группы
 
 # Состояния для ConversationHandler
-READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2 = range(11)
+READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2, CANCELLED = range(12)
 
 # Функция для создания кнопок "Отмена", "Критерии" и "Админы"
 def get_buttons():
     keyboard = [
-        [InlineKeyboardButton("Отмена", callback_data='reset')],
+        [InlineKeyboardButton("Отмена", callback_data='cancel')],
         [InlineKeyboardButton("Критерии", callback_data='criteria')],
         [InlineKeyboardButton("Админы", callback_data='admins')]  # Кнопка для отображения админов
     ]
@@ -179,21 +179,21 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 # Функция для сброса данных
-async def reset(update: Update, context: CallbackContext) -> int:
-    context.user_data.clear()  # Очищаем все данные пользователя
+async def cancel(update: Update, context: CallbackContext) -> int:
+    # Отправляем сообщение о сбросе
     await update.callback_query.message.edit_text(
-        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
-        reply_markup=get_buttons()  # Кнопка сброса
+        "Процесс подачи заявки отменен. Начни сначала, введя свой игровой никнейм.",
+        reply_markup=get_buttons()  # Добавляем кнопки
     )
-    # Вернуться в состояние NICKNAME для повторного ввода данных
+    # Возвращаем в начало процесса
     return NICKNAME
 
 # Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
+    if query.data == 'cancel':  # Проверяем callback_data
+        # Обрабатываем сброс
+        return await cancel(update, context)
     elif query.data == 'criteria':  # Кнопка для показа критериев
         criteria_text = (
             "Критерии клана DEKTRIAN FAMILY:\n"
@@ -242,6 +242,7 @@ def main() -> None:
             MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],  # Убедитесь, что это 9
             SCREENSHOT_1: [MessageHandler(filters.PHOTO, screenshot_1)],
             SCREENSHOT_2: [MessageHandler(filters.PHOTO, screenshot_2)],  # Новый шаг для второго скриншота
+            CANCELLED: [MessageHandler(filters.TEXT, cancel)]  # Состояние для отмены
         },
         fallbacks=[]  # Если нужно обработать ошибки или завершение процесса
     )

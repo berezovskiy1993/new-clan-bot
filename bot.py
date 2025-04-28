@@ -10,15 +10,12 @@ GROUP_ID = -1002640250280  # ID закрытой группы
 # Состояния для ConversationHandler
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2 = range(11)
 
-# Список админов клана
-ADMINS = ["@Admin1", "@Admin2", "@Admin3"]  # Замените на реальные никнеймы админов
-
-# Функция для создания кнопок
+# Функция для создания кнопок "Отмена", "Критерии" и "Админы"
 def get_buttons():
     keyboard = [
         [InlineKeyboardButton("Отмена", callback_data='reset')],
         [InlineKeyboardButton("Критерии", callback_data='criteria')],
-        [InlineKeyboardButton("Админы", callback_data='admins')]  # Кнопка для отображения списка админов
+        [InlineKeyboardButton("Админы", callback_data='admins')]  # Кнопка для отображения админов
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -190,7 +187,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     )
     return NICKNAME  # Возвращаем пользователя на ввод никнейма
 
-# Функция для обработки нажатия на кнопку сброса, критериев и админов
+# Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset':  # Проверяем callback_data
@@ -218,7 +215,11 @@ async def button_callback(update: Update, context: CallbackContext):
         )
         await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
     elif query.data == 'admins':  # Кнопка для показа списка админов
-        admins_text = "Список админов клана:\n" + "\n".join(ADMINS)
+        admins_text = "Список админов клана DEKTRIAN FAMILY:\n" \
+                      "1. Лидер клана - @DektrianTV\n" \
+                      "2. Заместитель - @Admin1\n" \
+                      "3. Модератор - @Admin2\n" \
+                      "4. Модератор - @Admin3\n"
         await query.message.edit_text(admins_text, reply_markup=get_buttons())  # Показываем список админов
     return
 

@@ -118,29 +118,25 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
 
 # Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
-    # Проверяем, если сообщение содержит фото
     if update.message.photo:
-        context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
+        context.user_data['screenshot_1'] = update.message.photo[-1].file_id
         await update.message.reply_text(
             "Теперь отправь скриншот статистики из игры за прошлый сезон.",
             reply_markup=get_buttons()  # Добавляем кнопки
         )
-        return SCREENSHOT_2  # Переходим к следующему шагу, ожидая второй скриншот
+        return SCREENSHOT_2
     else:
         await update.message.reply_text("Пожалуйста, отправьте скриншот.")
-        return SCREENSHOT_1  # Ожидаем повторно скриншот
+        return SCREENSHOT_1
 
 # Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
-    # Проверяем, если сообщение содержит фото
     if update.message.photo:
-        context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
+        context.user_data['screenshot_2'] = update.message.photo[-1].file_id
         
-        # Получаем юзернейм и айди пользователя Telegram
         telegram_username = update.message.from_user.username
         telegram_user_id = update.message.from_user.id        
         
-        # Формируем заявку
         application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
                       f"Игровой ник: {context.user_data['nickname']}\n" \
                       f"Игровой айди: {context.user_data['player_id']}\n" \
@@ -151,16 +147,14 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
                       f"КД за прошлый сезон: {context.user_data['kd_previous']}\n" \
                       f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n" \
                       f"Telegram Username: @{telegram_username}\n" \
-                      f"Telegram UserID: {telegram_user_id}\n"  # Добавляем Telegram юзернейм и айди
+                      f"Telegram UserID: {telegram_user_id}\n"
 
-        # Отправляем заявку админу и группе
         try:
             await context.bot.send_message(ADMIN_ID, application)
             await context.bot.send_message(GROUP_ID, application)
         except Exception as e:
             await update.message.reply_text(f"Ошибка при отправке сообщения: {e}")
 
-        # Отправка скриншотов
         try:
             await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_1'])
             await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_2'])
@@ -169,7 +163,6 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         except Exception as e:
             await update.message.reply_text(f"Ошибка при отправке скриншотов: {e}")
 
-        # Уведомление для пользователя
         await update.message.reply_text(
             "Ваша заявка отправлена, ожидайте ответ в течении дня! Если что-то не получилось или появились дополнительные вопросы, то напишите Лидеру клана @DektrianTV.",
             reply_markup=get_buttons()  # Добавляем кнопки
@@ -179,23 +172,29 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
 
 # Функция для сброса данных и перенаправления к начальной кнопке
 async def reset(update: Update, context: CallbackContext) -> int:
-    # Очищаем все данные пользователя
-    context.user_data.clear()  
+    context.user_data.clear()  # Очищаем все данные пользователя
     
-    # Перенаправляем пользователя на команду /start, чтобы начать заново
-    await update.callback_query.message.edit_text(
-        "Все данные были сброшены. Начни процесс подачи заявки заново, нажав на кнопку 'Старт'.",
-        reply_markup=get_buttons()  # Кнопка "Старт"
-    )
-    return READY  # Переходим в состояние "READY", что соответствует кнопке старт
+    message = update.callback_query.message
+    
+    # Проверяем, отличается ли текст или кнопки от уже отображающихся
+    if message.text != "Все данные были сброшены. Начни процесс подачи заявки заново, нажав на кнопку 'Старт'." or \
+       message.reply_markup != get_buttons():
+        await message.edit_text(
+            "Все данные были сброшены. Начни процесс подачи заявки заново, нажав на кнопку 'Старт'.",
+            reply_markup=get_buttons()  # Кнопка "Старт"
+        )
+    
+    return READY  # Переходим в состояние "READY"
 
 # Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных и перенаправляем на начало
+        # Выполняем сброс данных
         return await reset(update, context)
-    elif query.data == 'criteria':  # Кнопка для показа критериев
+    elif query.data == 'criteria':
+
+              # Показ критериев клана
         criteria_text = (
             "Критерии клана DEKTRIAN FAMILY:\n"
             "1. Смена тега в течении 7 дней.\n"
@@ -213,7 +212,7 @@ async def button_callback(update: Update, context: CallbackContext):
             "1. Смена тега в течении 7 дней.\n"
             "2. Возраст 16+\n"
             "3. Наличие результатов и хайлайтов\n"
-            "4. Преемущество отдается собранным пакам\n"            
+            "4. Преемущество отдается собранным пакам\n"
         )
         await query.message.edit_text(criteria_text, reply_markup=get_buttons())  # Показываем критерии с кнопками
     return
@@ -261,3 +260,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

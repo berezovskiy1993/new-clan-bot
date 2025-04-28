@@ -177,20 +177,23 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         
     return ConversationHandler.END
 
-# Функция для сброса данных
+# Функция для сброса данных и перенаправления к начальной кнопке
 async def reset(update: Update, context: CallbackContext) -> int:
-    context.user_data.clear()  # Очищаем все данные пользователя
+    # Очищаем все данные пользователя
+    context.user_data.clear()  
+    
+    # Перенаправляем пользователя на команду /start, чтобы начать заново
     await update.callback_query.message.edit_text(
-        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
-        reply_markup=get_buttons()  # Кнопка сброса
+        "Все данные были сброшены. Начни процесс подачи заявки заново, нажав на кнопку 'Старт'.",
+        reply_markup=get_buttons()  # Кнопка "Старт"
     )
-    return NICKNAME  # Возвращаем пользователя на ввод никнейма
+    return READY  # Переходим в состояние "READY", что соответствует кнопке старт
 
 # Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
+        # Выполняем сброс данных и перенаправляем на начало
         return await reset(update, context)
     elif query.data == 'criteria':  # Кнопка для показа критериев
         criteria_text = (

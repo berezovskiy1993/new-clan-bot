@@ -185,7 +185,8 @@ async def reset(update: Update, context: CallbackContext) -> int:
         "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
         reply_markup=get_buttons()  # Кнопка сброса
     )
-    return NICKNAME  # Возвращаем пользователя на ввод никнейма
+    # Вернуться в состояние NICKNAME для повторного ввода данных
+    return NICKNAME
 
 # Функция для обработки нажатия на кнопку сброса и критериев
 async def button_callback(update: Update, context: CallbackContext):

@@ -40,7 +40,6 @@ async def start(update: Update, context: CallbackContext) -> int:
         caption=" "
     )
     await update.message.reply_text(
-        
         "👋 Привет!\n\n"
         "Ты попал в бот клана DEKTRIAN FAMILY!\n"
         "Здесь ты можешь подать заявку в один из кланов:\n\n"
@@ -49,7 +48,6 @@ async def start(update: Update, context: CallbackContext) -> int:
         "▫️ ACADEMY — клан свободного стиля\n\n"
         "Напиши текстом 'да' и проходи анкету 📝\n\n",
         reply_markup=get_buttons()
-       
     )
     return READY
 

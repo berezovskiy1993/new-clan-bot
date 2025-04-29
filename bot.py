@@ -48,7 +48,6 @@ async def start(update: Update, context: CallbackContext) -> int:
         "▫️ *ESPORTS* — клан для турнирных составов\n"
         "▫️ *ACADEMY* — клан свободного стиля\n\n"
         "*Жми 'да'* и проходи анкету 📝\n\n"
-        "[YouTube](https://www.youtube.com/@Dektrian_TV) | [Twitch](https://www.twitch.tv/dektrian_tv) | [Telegram](https://t.me/dektrian_family)",
         parse_mode="MarkdownV2",
         reply_markup=get_buttons()
        

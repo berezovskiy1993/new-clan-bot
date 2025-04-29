@@ -47,7 +47,7 @@ async def start(update: Update, context: CallbackContext) -> int:
         "▫️ FAMILY — основной клан\n"
         "▫️ ESPORTS — клан для турнирных составов\n"
         "▫️ ACADEMY — клан свободного стиля\n\n"
-        "Жми 'да' и проходи анкету 📝\n\n"
+        "Жми 'да' и проходи анкету 📝\n\n",
         reply_markup=get_buttons()
        
     )

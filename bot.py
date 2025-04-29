@@ -19,7 +19,7 @@ def get_buttons():
         [InlineKeyboardButton("Отмена", callback_data='reset_button')],
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
         [InlineKeyboardButton("Админы", callback_data='admins_button')],
-        [InlineKeyboardButton("Новая", callback_data='new_button')]  # Кнопка для "Новая"
+        [InlineKeyboardButton("Новая", callback_data='new_button')]  # Кнопка для новой команды
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -191,7 +191,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     )
     return NICKNAME  # Возвращаем пользователя на ввод никнейма
 
-# Функция для обработки нажатия на кнопку сброса, критериев и админов
+# Функция для обработки нажатия на кнопку сброса, критериев, админов и новой кнопки
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset_button':  # Проверяем callback_data
@@ -221,8 +221,9 @@ async def button_callback(update: Update, context: CallbackContext):
     elif query.data == 'admins_button':  # Кнопка для показа списка админов
         admins_text = "Список админов клана:\n" + "\n".join(ADMINS)
         await query.message.edit_text(admins_text, reply_markup=get_buttons())  # Показываем список админов
-    elif query.data == 'new_button':  # Кнопка "Новая"
-        await query.message.edit_text("Отмена", reply_markup=get_buttons())  # Отправляем сообщение "отмена"
+    elif query.data == 'new_button':  # Обрабатываем кнопку "Новая"
+        await update.message.reply_text("Команда 'отмена' выполнена.")
+        return READY  # Возвращаем в начало
     return
 
 # Основная функция

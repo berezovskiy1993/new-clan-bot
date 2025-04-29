@@ -18,7 +18,7 @@ def get_buttons():
     keyboard = [
         [
             InlineKeyboardButton("Меню", callback_data='menu'),
-            InlineKeyboardButton("Отмена", callback_data='reset_button')
+            InlineKeyboardButton("Сначала", callback_data='reset_button')
         ]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -47,7 +47,7 @@ async def start(update: Update, context: CallbackContext) -> int:
         "▫️ FAMILY — основной клан\n"
         "▫️ ESPORTS — клан для турнирных составов\n"
         "▫️ ACADEMY — клан свободного стиля\n\n"
-        "Жми 'да' и проходи анкету 📝\n\n",
+        "Напиши текстом 'да' и проходи анкету 📝\n\n",
         reply_markup=get_buttons()
        
     )

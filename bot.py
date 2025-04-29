@@ -16,8 +16,7 @@ ADMINS = ["@Admin1", "@Admin2", "@Admin3"]  # Замените на реальн
 # Функция для создания кнопок
 def get_buttons():
     keyboard = [
-        [InlineKeyboardButton("Меню", callback_data='menu')],
-        [InlineKeyboardButton("Отмена", callback_data='reset')]
+        [InlineKeyboardButton("Меню", callback_data='menu')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -45,9 +44,6 @@ async def start(update: Update, context: CallbackContext) -> int:
 
 # Проверка на готовность подать заявку
 async def ready(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-
     user_response = update.message.text.lower()
     if user_response == 'да':
         await update.message.reply_text("Отлично! Напиши свой игровой никнейм.")
@@ -61,10 +57,6 @@ async def ready(update: Update, context: CallbackContext) -> int:
 
 # Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
         "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
@@ -74,10 +66,6 @@ async def nickname(update: Update, context: CallbackContext) -> int:
 
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['player_id'] = update.message.text
     await update.message.reply_text(
         "Сколько тебе полных лет?",
@@ -87,10 +75,6 @@ async def player_id(update: Update, context: CallbackContext) -> int:
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['age'] = update.message.text
     await update.message.reply_text(
         "Ты девочка или парень?",
@@ -100,10 +84,6 @@ async def age(update: Update, context: CallbackContext) -> int:
 
 # Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",
@@ -113,10 +93,6 @@ async def gender(update: Update, context: CallbackContext) -> int:
 
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['kd_current'] = update.message.text
     await update.message.reply_text(
         "Какой у тебя КД за прошлый сезон?",
@@ -126,10 +102,6 @@ async def kd_current(update: Update, context: CallbackContext) -> int:
 
 # Получение КД за прошлый сезон
 async def kd_previous(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['kd_previous'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в текущем сезоне?",
@@ -139,10 +111,6 @@ async def kd_previous(update: Update, context: CallbackContext) -> int:
 
 # Получение матчей за текущий сезон
 async def matches_current(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['matches_current'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в прошлом сезоне?",
@@ -152,10 +120,6 @@ async def matches_current(update: Update, context: CallbackContext) -> int:
 
 # Получение матчей за прошлый сезон
 async def matches_previous(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     context.user_data['matches_previous'] = update.message.text
     await update.message.reply_text(
         "Пожалуйста, отправь скриншот статистики из игры за текущий сезон.",
@@ -165,10 +129,6 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
 
 # Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
@@ -183,10 +143,6 @@ async def screenshot_1(update: Update, context: CallbackContext) -> int:
 
 # Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
-    if update.callback_query and update.callback_query.data == 'reset':
-        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
-        return NICKNAME
-
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
@@ -194,7 +150,7 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         # Получаем юзернейм и айди пользователя Telegram
         telegram_username = update.message.from_user.username
         telegram_user_id = update.message.from_user.id         
-        
+
         # Формируем заявку
         application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \
                       f"Игровой ник: {context.user_data['nickname']}\n" \
@@ -231,51 +187,6 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         )
         
     return ConversationHandler.END
-
-# Функция для сброса данных
-async def reset(update: Update, context: CallbackContext) -> int:
-    context.user_data.clear()  # Очищаем все данные пользователя
-    await update.callback_query.message.edit_text(
-        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
-        reply_markup=get_buttons()  # Кнопка сброса
-    )
-    return NICKNAME  # Возвращаем пользователя на ввод никнейма
-
-# Функция для обработки нажатия на кнопку сброса, меню, критериев и админов
-async def button_callback(update: Update, context: CallbackContext):
-    query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
-    elif query.data == 'menu':  # Показываем меню с кнопками
-        await query.message.edit_text("Выберите действие:", reply_markup=get_menu_buttons())
-    elif query.data == 'criteria':  # Кнопка для показа критериев
-        criteria_text = (
-            "Критерии клана DEKTRIAN FAMILY:\n"
-            "1. Смена тега в течении 7 дней.\n"
-            "2. Кд на 100 матчей (Девушки - 4; Мужчины - 5)\n"
-            "3. Возраст 16+.\n"
-            "4. Актив в телеграмм чате.\n"
-            "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
-            "Критерии клана DEKTRIAN ACADEMY:\n"
-            "1. Смена тега в течении 7 дней.\n"
-            "2. Кд и матчи не важны.\n"
-            "3. Возраст 14+.\n"
-            "4. Актив в телеграмм чате.\n"
-            "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
-            "Критерии клана DEKTRIAN ESPORTS:\n"
-            "1. Смена тега в течении 7 дней.\n"
-            "2. Возраст 16+\n"
-            "3. Наличие результатов и хайлайтов\n"
-            "4. Преемущество отдается собранным пакам\n"            
-        )
-        await query.message.edit_text(criteria_text, reply_markup=get_menu_buttons())  # Показываем критерии с кнопками
-    elif query.data == 'admins':  # Кнопка для показа списка админов
-        admins_text = "Список админов клана:\n" + "\n".join(ADMINS)
-        await query.message.edit_text(admins_text, reply_markup=get_menu_buttons())  # Показываем список админов
-    elif query.data == 'back_to_main':  # Возвращаемся к главному меню
-        await query.message.edit_text("Выберите действие:", reply_markup=get_buttons())  # Главное меню
-    return
 
 # Основная функция
 def main() -> None:

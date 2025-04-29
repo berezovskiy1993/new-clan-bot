@@ -40,8 +40,18 @@ async def start(update: Update, context: CallbackContext) -> int:
         caption=" "
     )
     await update.message.reply_text(
-        "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан — напишите 'да' или 'нет'.",
+        
+        "*👋 Привет!*\n\n"
+        "Ты попал в бот клана *DEKTRIAN FAMILY* по PUBG Mobile\\!\n"
+        "Здесь ты можешь подать заявку в один из кланов:\n\n"
+        "▫️ *FAMILY* — основной клан\n"
+        "▫️ *ESPORTS* — клан для турнирных составов\n"
+        "▫️ *ACADEMY* — клан свободного стиля\n\n"
+        "*Жми 'да'* и проходи анкету 📝\n\n"
+        "[YouTube](https://www.youtube.com/@Dektrian_TV) | [Twitch](https://www.twitch.tv/dektrian_tv) | [Telegram](https://t.me/dektrian_family)",
+        parse_mode="MarkdownV2",
         reply_markup=get_buttons()
+       
     )
     return READY
 

@@ -2,16 +2,18 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext, CallbackQueryHandler
 import os
 
-# Токен и ID администратора
+# Токен и ID администратора и группы
 TOKEN = '7912601677:AAE_saIpU_55S2dgEdnEnnXov0pw33BPVu0'
 ADMIN_ID = 894031843
 GROUP_ID = -1002640250280
 
-# Состояния
-READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, KD_PREVIOUS, MATCHES_CURRENT, MATCHES_PREVIOUS, SCREENSHOT_1, SCREENSHOT_2 = range(11)
+# Определение этапов диалога
+READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT_1, KD_PREVIOUS, MATCHES_PREVIOUS, SCREENSHOT_2 = range(11)
 
+# Список админов
 ADMINS = ["@Admin1", "@Admin2", "@Admin3"]
 
+# Кнопки внизу каждого шага
 def get_buttons():
     keyboard = [
         [
@@ -21,6 +23,7 @@ def get_buttons():
     ]
     return InlineKeyboardMarkup(keyboard)
 
+# Кнопки меню
 def get_menu_buttons():
     keyboard = [
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
@@ -29,6 +32,7 @@ def get_menu_buttons():
     ]
     return InlineKeyboardMarkup(keyboard)
 
+# Начало общения с ботом
 async def start(update: Update, context: CallbackContext) -> int:
     await update.message.reply_photo(
         photo="https://ibb.co/JRbbTWsQ",
@@ -40,6 +44,7 @@ async def start(update: Update, context: CallbackContext) -> int:
     )
     return READY
 
+# Ответ на "да"/"нет" — переход к никнейму
 async def ready(update: Update, context: CallbackContext) -> int:
     user_response = update.message.text.lower()
     if user_response == 'да':
@@ -52,63 +57,72 @@ async def ready(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.")
         return READY
 
-# Остальные состояния без изменений, только get_buttons заменён везде
-
+# Запись никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text("Теперь укажи свой игровой айди.", reply_markup=get_buttons())
     return PLAYER_ID
 
+# Запись ID
 async def player_id(update: Update, context: CallbackContext) -> int:
     context.user_data['player_id'] = update.message.text
     await update.message.reply_text("Сколько тебе полных лет?", reply_markup=get_buttons())
     return AGE
 
+# Запись возраста
 async def age(update: Update, context: CallbackContext) -> int:
     context.user_data['age'] = update.message.text
     await update.message.reply_text("Ты девочка или парень?", reply_markup=get_buttons())
     return GENDER
 
+# Запись пола
 async def gender(update: Update, context: CallbackContext) -> int:
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text("Какая у тебя КД за текущий сезон?", reply_markup=get_buttons())
     return KD_CURRENT
 
+# Запись КД текущего сезона
 async def kd_current(update: Update, context: CallbackContext) -> int:
     context.user_data['kd_current'] = update.message.text
-    await update.message.reply_text("Какой у тебя КД за прошлый сезон?", reply_markup=get_buttons())
-    return KD_PREVIOUS
-
-async def kd_previous(update: Update, context: CallbackContext) -> int:
-    context.user_data['kd_previous'] = update.message.text
     await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?", reply_markup=get_buttons())
     return MATCHES_CURRENT
 
+# Запись матчей текущего сезона
 async def matches_current(update: Update, context: CallbackContext) -> int:
     context.user_data['matches_current'] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?", reply_markup=get_buttons())
-    return MATCHES_PREVIOUS
-
-async def matches_previous(update: Update, context: CallbackContext) -> int:
-    context.user_data['matches_previous'] = update.message.text
     await update.message.reply_text("Отправь скриншот статистики за текущий сезон.", reply_markup=get_buttons())
     return SCREENSHOT_1
 
+# Получение скриншота текущего сезона
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id
-        await update.message.reply_text("Теперь отправь скриншот за прошлый сезон.", reply_markup=get_buttons())
-        return SCREENSHOT_2
+        await update.message.reply_text("Теперь укажи КД за прошлый сезон.", reply_markup=get_buttons())
+        return KD_PREVIOUS
     else:
         await update.message.reply_text("Пожалуйста, отправьте скриншот.")
         return SCREENSHOT_1
 
+# Запись КД прошлого сезона
+async def kd_previous(update: Update, context: CallbackContext) -> int:
+    context.user_data['kd_previous'] = update.message.text
+    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?", reply_markup=get_buttons())
+    return MATCHES_PREVIOUS
+
+# Запись матчей прошлого сезона
+async def matches_previous(update: Update, context: CallbackContext) -> int:
+    context.user_data['matches_previous'] = update.message.text
+    await update.message.reply_text("Теперь отправь скриншот за прошлый сезон.", reply_markup=get_buttons())
+    return SCREENSHOT_2
+
+# Получение скриншота прошлого сезона и отправка заявки
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id
         telegram_username = update.message.from_user.username
         telegram_user_id = update.message.from_user.id
 
+        # Формирование заявки
         application = (
             f"Заявка на вступление в клан DEKTRIAN FAMILY:\n"
             f"Игровой ник: {context.user_data['nickname']}\n"
@@ -123,6 +137,7 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
             f"Telegram UserID: {telegram_user_id}\n"
         )
 
+        # Отправка заявки админам и в группу
         try:
             await context.bot.send_message(ADMIN_ID, application)
             await context.bot.send_message(GROUP_ID, application)
@@ -137,9 +152,9 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
             "Ваша заявка отправлена, ожидайте ответ в течение дня! Если появились вопросы — напишите Лидеру @DektrianTV.",
             reply_markup=get_buttons()
         )
-
     return ConversationHandler.END
 
+# Сброс анкеты
 async def reset(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     await query.answer()
@@ -150,6 +165,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     )
     return NICKNAME
 
+# Обработка всех кнопок
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
@@ -175,6 +191,7 @@ async def button_callback(update: Update, context: CallbackContext):
     elif query.data == 'admins_button':
         await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
 
+# Основная функция запуска бота
 def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
@@ -187,10 +204,10 @@ def main() -> None:
             AGE: [MessageHandler(filters.TEXT & ~filters.COMMAND, age), CallbackQueryHandler(button_callback)],
             GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, gender), CallbackQueryHandler(button_callback)],
             KD_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_current), CallbackQueryHandler(button_callback)],
-            KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous), CallbackQueryHandler(button_callback)],
             MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current), CallbackQueryHandler(button_callback)],
-            MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous), CallbackQueryHandler(button_callback)],
             SCREENSHOT_1: [MessageHandler(filters.PHOTO, screenshot_1), CallbackQueryHandler(button_callback)],
+            KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous), CallbackQueryHandler(button_callback)],
+            MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous), CallbackQueryHandler(button_callback)],
             SCREENSHOT_2: [MessageHandler(filters.PHOTO, screenshot_2), CallbackQueryHandler(button_callback)],
         },
         fallbacks=[]
@@ -199,6 +216,7 @@ def main() -> None:
     application.add_handler(conversation_handler)
     application.add_handler(CallbackQueryHandler(button_callback))
 
+    # Запуск вебхука
     port = int(os.environ.get("PORT", 10000))
     application.run_webhook(
         listen="0.0.0.0",

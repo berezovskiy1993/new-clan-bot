@@ -45,6 +45,9 @@ async def start(update: Update, context: CallbackContext) -> int:
 
 # Проверка на готовность подать заявку
 async def ready(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+
     user_response = update.message.text.lower()
     if user_response == 'да':
         await update.message.reply_text("Отлично! Напиши свой игровой никнейм.")
@@ -58,6 +61,10 @@ async def ready(update: Update, context: CallbackContext) -> int:
 
 # Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
         "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
@@ -67,6 +74,10 @@ async def nickname(update: Update, context: CallbackContext) -> int:
 
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['player_id'] = update.message.text
     await update.message.reply_text(
         "Сколько тебе полных лет?",
@@ -76,6 +87,10 @@ async def player_id(update: Update, context: CallbackContext) -> int:
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['age'] = update.message.text
     await update.message.reply_text(
         "Ты девочка или парень?",
@@ -85,6 +100,10 @@ async def age(update: Update, context: CallbackContext) -> int:
 
 # Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",
@@ -94,6 +113,10 @@ async def gender(update: Update, context: CallbackContext) -> int:
 
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['kd_current'] = update.message.text
     await update.message.reply_text(
         "Какой у тебя КД за прошлый сезон?",
@@ -103,6 +126,10 @@ async def kd_current(update: Update, context: CallbackContext) -> int:
 
 # Получение КД за прошлый сезон
 async def kd_previous(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['kd_previous'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в текущем сезоне?",
@@ -112,6 +139,10 @@ async def kd_previous(update: Update, context: CallbackContext) -> int:
 
 # Получение матчей за текущий сезон
 async def matches_current(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['matches_current'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в прошлом сезоне?",
@@ -121,6 +152,10 @@ async def matches_current(update: Update, context: CallbackContext) -> int:
 
 # Получение матчей за прошлый сезон
 async def matches_previous(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     context.user_data['matches_previous'] = update.message.text
     await update.message.reply_text(
         "Пожалуйста, отправь скриншот статистики из игры за текущий сезон.",
@@ -130,6 +165,10 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
 
 # Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
@@ -144,13 +183,17 @@ async def screenshot_1(update: Update, context: CallbackContext) -> int:
 
 # Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
+    if update.callback_query and update.callback_query.data == 'reset':
+        return await reset(update, context)  # Если нажата кнопка "Отмена", сбрасываем данные
+        return NICKNAME
+
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
         
         # Получаем юзернейм и айди пользователя Telegram
         telegram_username = update.message.from_user.username
-        telegram_user_id = update.message.from_user.id        
+        telegram_user_id = update.message.from_user.id         
         
         # Формируем заявку
         application = f"Заявка на вступление в клан DEKTRIAN FAMILY:\n" \

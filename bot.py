@@ -26,7 +26,10 @@ def get_admins_button():
 
 def get_main_buttons():
     keyboard = [
-        [InlineKeyboardButton("Меню", callback_data='menu')]
+        [InlineKeyboardButton("Меню", callback_data='menu')],
+        [InlineKeyboardButton("Отмена", callback_data='cancel')],
+        [InlineKeyboardButton("Критерии", callback_data='criteria')],
+        [InlineKeyboardButton("Админы", callback_data='admins')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -214,11 +217,11 @@ def main() -> None:
             SCREENSHOT_1: [MessageHandler(filters.PHOTO | filters.TEXT, screenshot_1)],
             SCREENSHOT_2: [MessageHandler(filters.PHOTO | filters.TEXT, screenshot_2)],
         },
-        fallbacks=[CallbackQueryHandler(button_callback)]
+        fallbacks=[CallbackQueryHandler(button_callback, per_message=True)]  # Добавляем per_message=True
     )
 
     application.add_handler(conv_handler)
-    application.add_handler(CallbackQueryHandler(button_callback))
+    application.add_handler(CallbackQueryHandler(button_callback, per_message=True))  # Также здесь добавляем per_message=True
 
     port = int(os.environ.get("PORT", 10000))
     application.run_webhook(

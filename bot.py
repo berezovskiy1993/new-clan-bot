@@ -52,7 +52,7 @@ async def ready(update: Update, context: CallbackContext) -> int:
 async def nickname(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
+        return NICKNAME
 
     context.user_data['nickname'] = update.message.text  # Сохраняем никнейм
     await update.message.reply_text(
@@ -65,7 +65,7 @@ async def nickname(update: Update, context: CallbackContext) -> int:
 async def player_id(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
+        return NICKNAME
 
     context.user_data['player_id'] = update.message.text  # Сохраняем игровой ID
     await update.message.reply_text(
@@ -78,7 +78,7 @@ async def player_id(update: Update, context: CallbackContext) -> int:
 async def age(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
+        return NICKNAME
 
     context.user_data['age'] = update.message.text  # Сохраняем возраст
     await update.message.reply_text(
@@ -91,8 +91,8 @@ async def age(update: Update, context: CallbackContext) -> int:
 async def gender(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
-
+        return NICKNAME
+        
     context.user_data['gender'] = update.message.text.lower()  # Сохраняем пол
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",
@@ -104,7 +104,7 @@ async def gender(update: Update, context: CallbackContext) -> int:
 async def kd_current(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
+        return NICKNAME
 
     context.user_data['kd_current'] = update.message.text  # Сохраняем КД за текущий сезон
     await update.message.reply_text(
@@ -117,7 +117,7 @@ async def kd_current(update: Update, context: CallbackContext) -> int:
 async def kd_previous(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
+        return NICKNAME
 
     context.user_data['kd_previous'] = update.message.text  # Сохраняем КД за прошлый сезон
     await update.message.reply_text(

@@ -26,6 +26,12 @@ def get_admins_button():
 
 def get_main_buttons():
     keyboard = [
+        [InlineKeyboardButton("Меню", callback_data='menu')]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+def get_full_menu():
+    keyboard = [
         [InlineKeyboardButton("Отмена", callback_data='cancel')],
         [InlineKeyboardButton("Критерии", callback_data='criteria')],
         [InlineKeyboardButton("Админы", callback_data='admins')]
@@ -186,6 +192,8 @@ async def button_callback(update: Update, context: CallbackContext):
         await query.message.edit_text("Критерии вступления:\n- КД 4-5+\n- 16+ лет\n- Активность\n- Участие в стримах", reply_markup=get_main_buttons())
     elif query.data == 'admins':
         await query.message.edit_text("Админы:\n- Лидер: @DektrianTV\n- Заместители: @Admin1 @Admin2", reply_markup=get_main_buttons())
+    elif query.data == 'menu':
+        await query.message.edit_text("Выберите действие:", reply_markup=get_full_menu())
 
 # Основная функция запуска
 def main() -> None:

@@ -18,8 +18,7 @@ def get_buttons():
     keyboard = [
         [InlineKeyboardButton("Отмена", callback_data='reset_button')],
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
-        [InlineKeyboardButton("Админы", callback_data='admins_button')],
-        [InlineKeyboardButton("Новая", callback_data='new_button')]  # Кнопка для новой команды
+        [InlineKeyboardButton("Админы", callback_data='admins_button')]  # Кнопка для отображения списка админов
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -182,21 +181,15 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         
     return ConversationHandler.END
 
-# Функция для сброса данных
-async def reset(update: Update, context: CallbackContext) -> int:
-    context.user_data.clear()  # Очищаем все данные пользователя
-    await update.callback_query.message.edit_text(
-        "Все данные были сброшены. Начни процесс подачи заявки заново, введя свой игровой никнейм!",
-        reply_markup=get_buttons()  # Кнопка сброса
-    )
-    return NICKNAME  # Возвращаем пользователя на ввод никнейма
-
-# Функция для обработки нажатия на кнопку сброса, критериев, админов и новой кнопки
+# Функция для обработки нажатия на кнопку сброса, критериев и админов
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset_button':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
+        await query.message.edit_text(
+            "Вы вернулись на этап ввода никнейма. Пожалуйста, напишите свой игровой никнейм.",
+            reply_markup=get_buttons()  # Кнопка сброса
+        )
+        return NICKNAME  # Возвращаем пользователя на ввод никнейма
     elif query.data == 'criteria_button':  # Кнопка для показа критериев
         criteria_text = (
             "Критерии клана DEKTRIAN FAMILY:\n"
@@ -221,9 +214,6 @@ async def button_callback(update: Update, context: CallbackContext):
     elif query.data == 'admins_button':  # Кнопка для показа списка админов
         admins_text = "Список админов клана:\n" + "\n".join(ADMINS)
         await query.message.edit_text(admins_text, reply_markup=get_buttons())  # Показываем список админов
-    elif query.data == 'new_button':  # Обрабатываем кнопку "Новая"
-        await update.message.reply_text("Команда 'отмена' выполнена.")
-        return READY  # Возвращаем в начало
     return
 
 # Основная функция

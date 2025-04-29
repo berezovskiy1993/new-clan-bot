@@ -28,6 +28,7 @@ def get_menu_buttons():
     keyboard = [
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
         [InlineKeyboardButton("Админы", callback_data='admins_button')],
+        [InlineKeyboardButton("Соцсети", callback_data='socials_button')],
         [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -190,6 +191,16 @@ async def button_callback(update: Update, context: CallbackContext):
         )
     elif query.data == 'admins_button':
         await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
+    elif query.data == 'socials_button':
+        await query.message.edit_text(
+            "Соцсети Лидера клана:\n\n"
+            "YouTube: https://youtube.com/@Dektrian\n"
+            "Twitch: https://twitch.tv/dektrian\n"
+            "Группа Telegram: https://t.me/dektrian_family\n"
+            "Канал Telegram: https://t.me/dektrian_channel\n"
+            "TikTok: https://tiktok.com/@dektriantv",
+            reply_markup=get_menu_buttons()
+        )
 
 # Основная функция запуска бота
 def main() -> None:

@@ -58,7 +58,7 @@ async def ready(update: Update, context: CallbackContext) -> int:
 
 async def nickname(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text("Теперь укажи свой игровой ID.", reply_markup=get_main_buttons())
@@ -66,7 +66,7 @@ async def nickname(update: Update, context: CallbackContext) -> int:
 
 async def player_id(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['player_id'] = update.message.text
     await update.message.reply_text("Сколько тебе полных лет?", reply_markup=get_main_buttons())
@@ -74,7 +74,7 @@ async def player_id(update: Update, context: CallbackContext) -> int:
 
 async def age(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['age'] = update.message.text
     await update.message.reply_text("Ты девочка или парень?", reply_markup=get_main_buttons())
@@ -82,7 +82,7 @@ async def age(update: Update, context: CallbackContext) -> int:
 
 async def gender(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text("Какая у тебя КД за текущий сезон?", reply_markup=get_main_buttons())
@@ -90,7 +90,7 @@ async def gender(update: Update, context: CallbackContext) -> int:
 
 async def kd_current(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['kd_current'] = update.message.text
     await update.message.reply_text("Какой КД у тебя был за прошлый сезон?", reply_markup=get_main_buttons())
@@ -98,7 +98,7 @@ async def kd_current(update: Update, context: CallbackContext) -> int:
 
 async def kd_previous(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['kd_previous'] = update.message.text
     await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?", reply_markup=get_main_buttons())
@@ -106,7 +106,7 @@ async def kd_previous(update: Update, context: CallbackContext) -> int:
 
 async def matches_current(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['matches_current'] = update.message.text
     await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?", reply_markup=get_main_buttons())
@@ -114,7 +114,7 @@ async def matches_current(update: Update, context: CallbackContext) -> int:
 
 async def matches_previous(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     context.user_data['matches_previous'] = update.message.text
     await update.message.reply_text("Отправь скриншот за текущий сезон.", reply_markup=get_main_buttons())
@@ -122,7 +122,7 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
 
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id
@@ -134,7 +134,7 @@ async def screenshot_1(update: Update, context: CallbackContext) -> int:
 
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
     if await check_cancel(update, context):
-        return CANCELLED
+        return NICKNAME
 
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id
@@ -168,13 +168,13 @@ async def cancel(update: Update, context: CallbackContext) -> int:
         await update.callback_query.message.edit_text("Процесс отменён. Начни заново, если хочешь.", reply_markup=get_main_buttons())
     else:
         await update.message.reply_text("Процесс отменён. Начни заново, если хочешь.", reply_markup=get_main_buttons())
-    return ConversationHandler.END
+    return NICKNAME
 
 # Проверка отмены в сообщениях
 async def check_cancel(update: Update, context: CallbackContext) -> bool:
     if update.message and update.message.text and update.message.text.lower() == "отмена":
         await cancel(update, context)
-        return True
+        return NICKNAME
     return False
 
 # Функция обработки нажатия кнопок

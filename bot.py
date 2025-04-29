@@ -50,78 +50,114 @@ async def ready(update: Update, context: CallbackContext) -> int:
 
 # Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
-    context.user_data['nickname'] = update.message.text
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['nickname'] = update.message.text  # Сохраняем никнейм
     await update.message.reply_text(
         "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return PLAYER_ID
+    return PLAYER_ID  # Переход к следующему этапу
 
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
-    context.user_data['player_id'] = update.message.text
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['player_id'] = update.message.text  # Сохраняем игровой ID
     await update.message.reply_text(
         "Сколько тебе полных лет?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return AGE
+    return AGE  # Переход к следующему этапу
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
-    context.user_data['age'] = update.message.text
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['age'] = update.message.text  # Сохраняем возраст
     await update.message.reply_text(
         "Ты девочка или парень?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return GENDER
+    return GENDER  # Переход к следующему этапу
 
 # Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
-    context.user_data['gender'] = update.message.text.lower()
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['gender'] = update.message.text.lower()  # Сохраняем пол
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return KD_CURRENT
+    return KD_CURRENT  # Переход к следующему этапу
 
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
-    context.user_data['kd_current'] = update.message.text
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['kd_current'] = update.message.text  # Сохраняем КД за текущий сезон
     await update.message.reply_text(
         "Какой у тебя КД за прошлый сезон?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return KD_PREVIOUS
+    return KD_PREVIOUS  # Переход к следующему этапу
 
 # Получение КД за прошлый сезон
 async def kd_previous(update: Update, context: CallbackContext) -> int:
-    context.user_data['kd_previous'] = update.message.text
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['kd_previous'] = update.message.text  # Сохраняем КД за прошлый сезон
     await update.message.reply_text(
         "Сколько матчей ты сыграл в текущем сезоне?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return MATCHES_CURRENT
+    return MATCHES_CURRENT  # Переход к следующему этапу
 
 # Получение матчей за текущий сезон
 async def matches_current(update: Update, context: CallbackContext) -> int:
-    context.user_data['matches_current'] = update.message.text
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['matches_current'] = update.message.text  # Сохраняем количество матчей за текущий сезон
     await update.message.reply_text(
         "Сколько матчей ты сыграл в прошлом сезоне?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return MATCHES_PREVIOUS
+    return MATCHES_PREVIOUS  # Переход к следующему этапу
 
 # Получение матчей за прошлый сезон
 async def matches_previous(update: Update, context: CallbackContext) -> int:
-    context.user_data['matches_previous'] = update.message.text
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
+    context.user_data['matches_previous'] = update.message.text  # Сохраняем количество матчей за прошлый сезон
     await update.message.reply_text(
         "Пожалуйста, отправь скриншот статистики из игры за текущий сезон.",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return SCREENSHOT_1
+    return SCREENSHOT_1  # Переход к следующему этапу
 
 # Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
@@ -136,9 +172,22 @@ async def screenshot_1(update: Update, context: CallbackContext) -> int:
 
 # Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
+    query = update.callback_query
+    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
+        return await reset(update, context)  # Сброс данных и возврат на первый этап
+
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
+        # Формируем заявку и отправляем её
+        await update.message.reply_text(
+            "Ваша заявка отправлена! Если что-то не получилось, напишите Лидеру клана @DektrianTV.",
+            reply_markup=get_buttons()  # Добавляем кнопки
+        )
+        
+    return ConversationHandler.END
+
+
         
         # Получаем юзернейм и айди пользователя Telegram
         telegram_username = update.message.from_user.username

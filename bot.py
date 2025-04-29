@@ -241,7 +241,7 @@ async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset_button':  # Проверяем callback_data
         # Выполняем сброс данных
-        return await reset(update, context)
+        return NICKNAME
     elif query.data == 'criteria_button':  # Кнопка для показа критериев
         criteria_text = (
             "Критерии клана DEKTRIAN FAMILY:\n"

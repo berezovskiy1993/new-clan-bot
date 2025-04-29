@@ -58,12 +58,6 @@ async def ready(update: Update, context: CallbackContext) -> int:
 
 # Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
-        return NICKNAME
-        
     context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
         "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
@@ -73,13 +67,6 @@ async def nickname(update: Update, context: CallbackContext) -> int:
 
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
-    
-    query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
-        return NICKNAME
-    
     context.user_data['player_id'] = update.message.text
     await update.message.reply_text(
         "Сколько тебе полных лет?",
@@ -98,13 +85,6 @@ async def age(update: Update, context: CallbackContext) -> int:
 
 # Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query.data == 'reset':  # Проверяем callback_data
-        # Выполняем сброс данных
-        return await reset(update, context)
-        return NICKNAME
-    
-    
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",

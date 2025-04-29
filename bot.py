@@ -18,7 +18,8 @@ def get_buttons():
     keyboard = [
         [InlineKeyboardButton("Отмена", callback_data='reset_button')],
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
-        [InlineKeyboardButton("Админы", callback_data='admins_button')]  # Кнопка для отображения списка админов
+        [InlineKeyboardButton("Админы", callback_data='admins_button')],
+        [InlineKeyboardButton("Новая", callback_data='new_button')]  # Кнопка для "Новая"
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -50,114 +51,78 @@ async def ready(update: Update, context: CallbackContext) -> int:
 
 # Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return NICKNAME
-
-    context.user_data['nickname'] = update.message.text  # Сохраняем никнейм
+    context.user_data['nickname'] = update.message.text
     await update.message.reply_text(
         "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return PLAYER_ID  # Переход к следующему этапу
+    return PLAYER_ID
 
 # Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return NICKNAME
-
-    context.user_data['player_id'] = update.message.text  # Сохраняем игровой ID
+    context.user_data['player_id'] = update.message.text
     await update.message.reply_text(
         "Сколько тебе полных лет?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return AGE  # Переход к следующему этапу
+    return AGE
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return NICKNAME
-
-    context.user_data['age'] = update.message.text  # Сохраняем возраст
+    context.user_data['age'] = update.message.text
     await update.message.reply_text(
         "Ты девочка или парень?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return GENDER  # Переход к следующему этапу
+    return GENDER
 
 # Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return NICKNAME
-        
-    context.user_data['gender'] = update.message.text.lower()  # Сохраняем пол
+    context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return KD_CURRENT  # Переход к следующему этапу
+    return KD_CURRENT
 
 # Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return NICKNAME
-
-    context.user_data['kd_current'] = update.message.text  # Сохраняем КД за текущий сезон
+    context.user_data['kd_current'] = update.message.text
     await update.message.reply_text(
         "Какой у тебя КД за прошлый сезон?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return KD_PREVIOUS  # Переход к следующему этапу
+    return KD_PREVIOUS
 
 # Получение КД за прошлый сезон
 async def kd_previous(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return NICKNAME
-
-    context.user_data['kd_previous'] = update.message.text  # Сохраняем КД за прошлый сезон
+    context.user_data['kd_previous'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в текущем сезоне?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return MATCHES_CURRENT  # Переход к следующему этапу
+    return MATCHES_CURRENT
 
 # Получение матчей за текущий сезон
 async def matches_current(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
-
-    context.user_data['matches_current'] = update.message.text  # Сохраняем количество матчей за текущий сезон
+    context.user_data['matches_current'] = update.message.text
     await update.message.reply_text(
         "Сколько матчей ты сыграл в прошлом сезоне?",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return MATCHES_PREVIOUS  # Переход к следующему этапу
+    return MATCHES_PREVIOUS
 
 # Получение матчей за прошлый сезон
 async def matches_previous(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
-
-    context.user_data['matches_previous'] = update.message.text  # Сохраняем количество матчей за прошлый сезон
+    context.user_data['matches_previous'] = update.message.text
     await update.message.reply_text(
         "Пожалуйста, отправь скриншот статистики из игры за текущий сезон.",
         reply_markup=get_buttons()  # Добавляем кнопки
     )
-    return SCREENSHOT_1  # Переход к следующему этапу
+    return SCREENSHOT_1
 
 # Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
-
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id  # Сохраняем первый скриншот
@@ -172,19 +137,9 @@ async def screenshot_1(update: Update, context: CallbackContext) -> int:
 
 # Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    if query and query.data == 'reset_button':  # Проверка нажатия кнопки "Отмена"
-        return await reset(update, context)  # Сброс данных и возврат на первый этап
-
     # Проверяем, если сообщение содержит фото
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id  # Сохраняем второй скриншот
-        # Формируем заявку и отправляем её
-        await update.message.reply_text(
-            "Ваша заявка отправлена! Если что-то не получилось, напишите Лидеру клана @DektrianTV.",
-            reply_markup=get_buttons()  # Добавляем кнопки
-        )
-        
         
         # Получаем юзернейм и айди пользователя Telegram
         telegram_username = update.message.from_user.username
@@ -241,7 +196,7 @@ async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'reset_button':  # Проверяем callback_data
         # Выполняем сброс данных
-        return NICKNAME
+        return await reset(update, context)
     elif query.data == 'criteria_button':  # Кнопка для показа критериев
         criteria_text = (
             "Критерии клана DEKTRIAN FAMILY:\n"
@@ -266,6 +221,8 @@ async def button_callback(update: Update, context: CallbackContext):
     elif query.data == 'admins_button':  # Кнопка для показа списка админов
         admins_text = "Список админов клана:\n" + "\n".join(ADMINS)
         await query.message.edit_text(admins_text, reply_markup=get_buttons())  # Показываем список админов
+    elif query.data == 'new_button':  # Кнопка "Новая"
+        await query.message.edit_text("Отмена", reply_markup=get_buttons())  # Отправляем сообщение "отмена"
     return
 
 # Основная функция

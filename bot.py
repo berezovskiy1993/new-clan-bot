@@ -67,6 +67,16 @@ async def player_id(update: Update, context: CallbackContext) -> int:
 
 # Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
+    # Проверяем, нажата ли кнопка "Отмена"
+    if update.message.text.lower() == 'отмена':
+        context.user_data.clear()
+        await update.message.reply_text(
+            "Отмена процесса. Давайте начнем сначала. Напишите свой игровой никнейм:",
+            reply_markup=get_buttons()
+        )
+        return NICKNAME
+
+    # Иначе продолжаем обычную логику
     context.user_data['age'] = update.message.text
     await update.message.reply_text(
         "Ты девочка или парень?",
@@ -76,6 +86,14 @@ async def age(update: Update, context: CallbackContext) -> int:
 
 # Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
+    if update.message.text.lower() == 'отмена':
+        context.user_data.clear()
+        await update.message.reply_text(
+            "Отмена процесса. Давайте начнем сначала. Напишите свой игровой никнейм:",
+            reply_markup=get_buttons()
+        )
+        return NICKNAME
+
     context.user_data['gender'] = update.message.text.lower()
     await update.message.reply_text(
         "Какая у тебя КД за текущий сезон?",

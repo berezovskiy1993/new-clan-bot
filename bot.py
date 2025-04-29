@@ -35,6 +35,10 @@ def get_menu_buttons():
 
 # Старт
 async def start(update: Update, context: CallbackContext) -> int:
+    await update.message.reply_photo(
+        photo="https://ibb.co/JRbbTWsQ",
+        caption=" "
+    )
     await update.message.reply_text(
         "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан — напишите 'да' или 'нет'.",
         reply_markup=get_buttons()

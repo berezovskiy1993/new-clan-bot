@@ -34,10 +34,6 @@ def get_main_buttons():
 
 # Стартовая функция
 async def start(update: Update, context: CallbackContext) -> int:
-    await update.message.reply_photo(
-        photo="https://ibb.co/JRbbTWsQ",
-        caption=" "
-    )
     await update.message.reply_text(
         "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
         reply_markup=get_main_buttons()
@@ -46,180 +42,156 @@ async def start(update: Update, context: CallbackContext) -> int:
 
 # Проверка на готовность подать заявку
 async def ready(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     user_response = update.message.text.lower()
     if user_response == 'да':
-        await update.message.reply_text("Отлично! Напиши свой игровой никнейм.")
+        await update.message.reply_text("Отлично! Напиши свой игровой никнейм.", reply_markup=get_main_buttons())
         return NICKNAME
     elif user_response == 'нет':
-        await update.message.reply_text("Если передумаешь, напиши 'да'.")
+        await update.message.reply_text("Если передумаешь, напиши 'да'.", reply_markup=get_main_buttons())
         return READY
     else:
-        await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.")
+        await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.", reply_markup=get_main_buttons())
         return READY
 
-# Получение никнейма
 async def nickname(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['nickname'] = update.message.text
-    await update.message.reply_text(
-        "Отлично! Теперь, пожалуйста, укажи свой игровой айди.",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Теперь укажи свой игровой ID.", reply_markup=get_main_buttons())
     return PLAYER_ID
 
-# Получение игрового ID
 async def player_id(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['player_id'] = update.message.text
-    await update.message.reply_text(
-        "Сколько тебе полных лет?",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Сколько тебе полных лет?", reply_markup=get_main_buttons())
     return AGE
 
-# Получение возраста
 async def age(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['age'] = update.message.text
-    await update.message.reply_text(
-        "Ты девочка или парень?",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Ты девочка или парень?", reply_markup=get_main_buttons())
     return GENDER
 
-# Получение пола
 async def gender(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['gender'] = update.message.text.lower()
-    await update.message.reply_text(
-        "Какая у тебя КД за текущий сезон?",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Какая у тебя КД за текущий сезон?", reply_markup=get_main_buttons())
     return KD_CURRENT
 
-# Получение КД за текущий сезон
 async def kd_current(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['kd_current'] = update.message.text
-    await update.message.reply_text(
-        "Какой у тебя КД за прошлый сезон?",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Какой КД у тебя был за прошлый сезон?", reply_markup=get_main_buttons())
     return KD_PREVIOUS
 
-# Получение КД за прошлый сезон
 async def kd_previous(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['kd_previous'] = update.message.text
-    await update.message.reply_text(
-        "Сколько матчей ты сыграл в текущем сезоне?",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?", reply_markup=get_main_buttons())
     return MATCHES_CURRENT
 
-# Получение матчей за текущий сезон
 async def matches_current(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['matches_current'] = update.message.text
-    await update.message.reply_text(
-        "Сколько матчей ты сыграл в прошлом сезоне?",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?", reply_markup=get_main_buttons())
     return MATCHES_PREVIOUS
 
-# Получение матчей за прошлый сезон
 async def matches_previous(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     context.user_data['matches_previous'] = update.message.text
-    await update.message.reply_text(
-        "Пожалуйста, отправь скриншот статистики из игры за текущий сезон.",
-        reply_markup=get_main_buttons()
-    )
+    await update.message.reply_text("Отправь скриншот за текущий сезон.", reply_markup=get_main_buttons())
     return SCREENSHOT_1
 
-# Получение первого скриншота
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     if update.message.photo:
         context.user_data['screenshot_1'] = update.message.photo[-1].file_id
-        await update.message.reply_text(
-            "Теперь отправь скриншот статистики из игры за прошлый сезон.",
-            reply_markup=get_main_buttons()
-        )
+        await update.message.reply_text("Отправь скриншот за прошлый сезон.", reply_markup=get_main_buttons())
         return SCREENSHOT_2
     else:
-        await update.message.reply_text("Пожалуйста, отправьте скриншот.")
+        await update.message.reply_text("Пожалуйста, отправьте скриншот.", reply_markup=get_main_buttons())
         return SCREENSHOT_1
 
-# Получение второго скриншота
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
+    if await check_cancel(update, context):
+        return CANCELLED
+
     if update.message.photo:
         context.user_data['screenshot_2'] = update.message.photo[-1].file_id
 
-        telegram_username = update.message.from_user.username
-        telegram_user_id = update.message.from_user.id
-
         application_text = (
-            f"Заявка на вступление в клан DEKTRIAN FAMILY:\n"
-            f"Игровой ник: {context.user_data['nickname']}\n"
-            f"Игровой айди: {context.user_data['player_id']}\n"
+            f"Заявка на вступление:\n"
+            f"Ник: {context.user_data['nickname']}\n"
+            f"ID: {context.user_data['player_id']}\n"
             f"Возраст: {context.user_data['age']}\n"
             f"Пол: {context.user_data['gender']}\n"
-            f"КД за текущий сезон: {context.user_data['kd_current']}\n"
-            f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n"
-            f"КД за прошлый сезон: {context.user_data['kd_previous']}\n"
-            f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n"
-            f"Telegram Username: @{telegram_username}\n"
-            f"Telegram UserID: {telegram_user_id}"
+            f"КД текущий: {context.user_data['kd_current']}\n"
+            f"КД прошлый: {context.user_data['kd_previous']}\n"
+            f"Матчи текущий: {context.user_data['matches_current']}\n"
+            f"Матчи прошлый: {context.user_data['matches_previous']}\n"
         )
 
-        try:
-            await context.bot.send_message(ADMIN_ID, application_text)
-            await context.bot.send_message(GROUP_ID, application_text)
-            await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_1'])
-            await context.bot.send_photo(ADMIN_ID, photo=context.user_data['screenshot_2'])
-            await context.bot.send_photo(GROUP_ID, photo=context.user_data['screenshot_1'])
-            await context.bot.send_photo(GROUP_ID, photo=context.user_data['screenshot_2'])
-        except Exception as e:
-            await update.message.reply_text(f"Ошибка при отправке: {e}")
+        await context.bot.send_message(ADMIN_ID, application_text)
+        await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_1'])
+        await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_2'])
 
-        await update.message.reply_text(
-            "Ваша заявка отправлена! Ожидайте ответ в течение дня. Если возникли вопросы, пишите Лидеру клана @DektrianTV.",
-            reply_markup=get_main_buttons()
-        )
-    return ConversationHandler.END
+        await update.message.reply_text("Заявка отправлена. Ожидайте ответа.", reply_markup=get_main_buttons())
+        return ConversationHandler.END
+    else:
+        await update.message.reply_text("Пожалуйста, отправьте скриншот.", reply_markup=get_main_buttons())
+        return SCREENSHOT_2
 
-# Функция отмены процесса
+# Обработка отмены
 async def cancel(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()
-    await update.callback_query.message.edit_text(
-        "Процесс подачи заявки отменен. Начни сначала, введя свой игровой никнейм.",
-        reply_markup=get_main_buttons()
-    )
-    return NICKNAME
+    if update.callback_query:
+        await update.callback_query.message.edit_text("Процесс отменён. Начни заново, если хочешь.", reply_markup=get_main_buttons())
+    else:
+        await update.message.reply_text("Процесс отменён. Начни заново, если хочешь.", reply_markup=get_main_buttons())
+    return ConversationHandler.END
 
-# Функция обработки кнопок
+# Проверка отмены в сообщениях
+async def check_cancel(update: Update, context: CallbackContext) -> bool:
+    if update.message and update.message.text and update.message.text.lower() == "отмена":
+        await cancel(update, context)
+        return True
+    return False
+
+# Функция обработки нажатия кнопок
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     if query.data == 'cancel':
-        return await cancel(update, context)
+        await cancel(update, context)
     elif query.data == 'criteria':
-        criteria_text = (
-            "Критерии клана DEKTRIAN FAMILY:\n"
-            "1. Смена тега в течении 7 дней.\n"
-            "2. КД на 100 матчей (Девушки - 4; Мужчины - 5)\n"
-            "3. Возраст 16+.\n"
-            "4. Актив в телеграм-чате.\n"
-            "5. Участие на стримах лидера и мероприятиях."
-        )
-        await query.message.edit_text(criteria_text, reply_markup=get_main_buttons())
+        await query.message.edit_text("Критерии вступления:\n- КД 4-5+\n- 16+ лет\n- Активность\n- Участие в стримах", reply_markup=get_main_buttons())
     elif query.data == 'admins':
-        admins_text = (
-            "Список админов клана DEKTRIAN FAMILY:\n"
-            "1. Лидер - @DektrianTV\n"
-            "2. Заместитель - @Admin1\n"
-            "3. Модератор - @Admin2\n"
-            "4. Модератор - @Admin3"
-        )
-        await query.message.edit_text(admins_text, reply_markup=get_main_buttons())
+        await query.message.edit_text("Админы:\n- Лидер: @DektrianTV\n- Заместители: @Admin1 @Admin2", reply_markup=get_main_buttons())
 
 # Основная функция запуска
-
 def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
-    conversation_handler = ConversationHandler(
+    conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
             READY: [MessageHandler(filters.TEXT & ~filters.COMMAND, ready)],
@@ -231,18 +203,16 @@ def main() -> None:
             KD_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, kd_previous)],
             MATCHES_CURRENT: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_current)],
             MATCHES_PREVIOUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, matches_previous)],
-            SCREENSHOT_1: [MessageHandler(filters.PHOTO, screenshot_1)],
-            SCREENSHOT_2: [MessageHandler(filters.PHOTO, screenshot_2)],
-            CANCELLED: [MessageHandler(filters.TEXT, cancel)]
+            SCREENSHOT_1: [MessageHandler(filters.PHOTO | filters.TEXT, screenshot_1)],
+            SCREENSHOT_2: [MessageHandler(filters.PHOTO | filters.TEXT, screenshot_2)],
         },
-        fallbacks=[]
+        fallbacks=[CallbackQueryHandler(button_callback)]
     )
 
+    application.add_handler(conv_handler)
     application.add_handler(CallbackQueryHandler(button_callback))
-    application.add_handler(conversation_handler)
 
     port = int(os.environ.get("PORT", 10000))
-
     application.run_webhook(
         listen="0.0.0.0",
         port=port,

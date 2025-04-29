@@ -185,9 +185,6 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
             reply_markup=get_buttons()  # Добавляем кнопки
         )
         
-    return ConversationHandler.END
-
-
         
         # Получаем юзернейм и айди пользователя Telegram
         telegram_username = update.message.from_user.username

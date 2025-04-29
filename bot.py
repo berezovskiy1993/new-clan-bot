@@ -14,9 +14,18 @@ ADMINS = ["@Admin1", "@Admin2", "@Admin3"]
 
 def get_buttons():
     keyboard = [
-        [InlineKeyboardButton("Отмена", callback_data='reset_button')],
+        [
+            InlineKeyboardButton("Меню", callback_data='menu'),
+            InlineKeyboardButton("Отмена", callback_data='reset_button')
+        ]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+def get_menu_buttons():
+    keyboard = [
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
-        [InlineKeyboardButton("Админы", callback_data='admins_button')]
+        [InlineKeyboardButton("Админы", callback_data='admins_button')],
+        [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -26,7 +35,7 @@ async def start(update: Update, context: CallbackContext) -> int:
         caption=" "
     )
     await update.message.reply_text(
-        "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан - напишите 'да' или 'нет'.",
+        "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан — напишите 'да' или 'нет'.",
         reply_markup=get_buttons()
     )
     return READY
@@ -42,6 +51,8 @@ async def ready(update: Update, context: CallbackContext) -> int:
     else:
         await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.")
         return READY
+
+# Остальные состояния без изменений, только get_buttons заменён везде
 
 async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data['nickname'] = update.message.text
@@ -123,7 +134,7 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
             await update.message.reply_text(f"Ошибка при отправке: {e}")
 
         await update.message.reply_text(
-            "Ваша заявка отправлена, ожидайте ответ в течении дня! Если появились вопросы — напишите Лидеру @DektrianTV.",
+            "Ваша заявка отправлена, ожидайте ответ в течение дня! Если появились вопросы — напишите Лидеру @DektrianTV.",
             reply_markup=get_buttons()
         )
 
@@ -141,10 +152,15 @@ async def reset(update: Update, context: CallbackContext) -> int:
 
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
+    await query.answer()
+
     if query.data == 'reset_button':
         return await reset(update, context)
+    elif query.data == 'menu':
+        await query.message.edit_reply_markup(reply_markup=get_menu_buttons())
+    elif query.data == 'back_button':
+        await query.message.edit_reply_markup(reply_markup=get_buttons())
     elif query.data == 'criteria_button':
-        await query.answer()
         await query.message.edit_text(
             "Критерии клана DEKTRIAN FAMILY:\n"
             "1. Смена тега в течении 7 дней.\n"
@@ -154,11 +170,10 @@ async def button_callback(update: Update, context: CallbackContext):
             "5. Участие в стримах и мероприятиях\n\n"
             "ACADEMY: без ограничений по КД и матчам, 14+\n"
             "ESPORTS: 16+, результаты, хайлайты, паки.",
-            reply_markup=get_buttons()
+            reply_markup=get_menu_buttons()
         )
     elif query.data == 'admins_button':
-        await query.answer()
-        await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_buttons())
+        await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
 
 def main() -> None:
     application = Application.builder().token(TOKEN).build()

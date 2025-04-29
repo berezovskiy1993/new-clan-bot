@@ -40,7 +40,7 @@ async def start(update: Update, context: CallbackContext) -> int:
         caption=" "
     )
     await update.message.reply_text(
-        "</b>Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан — напишите 'да' или 'нет'.</b>",
+        "Привет! Я бот клана DEKTRIAN FAMILY. Если готовы подать заявку на вступление в клан — напишите 'да' или 'нет'.",
         reply_markup=get_buttons()
     )
     return READY

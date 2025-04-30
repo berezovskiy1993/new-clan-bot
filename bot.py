@@ -146,11 +146,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     await query.answer()
     context.user_data.clear()
-    await query.message.edit_text(
-              "Все данные были сброшены!\n"              
-              "Напиши текстом "да" если готов начать подачу заявки заново.\n",             
-              reply_markup=get_menu_buttons()
-          )
+    await query.message.edit_text("Все введенные данные были сброшены. Начни заново с никнейма.", reply_markup=get_buttons())                 
     return READY
 
 async def button_callback(update: Update, context: CallbackContext):

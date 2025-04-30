@@ -172,12 +172,12 @@ async def reset(update: Update, context: CallbackContext) -> int:
 
 # Обработка всех кнопок
 async def button_callback(update: Update, context: CallbackContext):
-     query = update.callback_query
-     await query.answer()
+    query = update.callback_query
+    await query.answer()
  @@ -175,46 +159,26 @@ async def button_callback(update: Update, context: CallbackContext):
-         await query.message.edit_reply_markup(reply_markup=get_buttons())
-     elif query.data == 'criteria_button':
-         await query.message.edit_text(
+        await query.message.edit_reply_markup(reply_markup=get_buttons())
+    elif query.data == 'criteria_button':
+        await query.message.edit_text(
              "Критерии клана DEKTRIAN FAMILY:\n"
              "1. Смена тега в течении 7 дней.\n"
              "2. Кд на 100 матчей (Девушки - 4; Мужчины - 5)\n"
@@ -199,21 +199,21 @@ async def button_callback(update: Update, context: CallbackContext):
              "4. Преимущество отдается собранным пакам\n",
              "Критерии DEKTRIAN FAMILY...\n(уже прописаны)",
              reply_markup=get_menu_buttons()
-         )
-     elif query.data == 'admins_button':
-         await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
-     elif query.data == 'socials_button':
+        )
+    elif query.data == 'admins_button':
+        await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
+    elif query.data == 'socials_button':
          socials_keyboard = InlineKeyboardMarkup([
-         await query.message.edit_text("Выберите платформу:", reply_markup=InlineKeyboardMarkup([
+        await query.message.edit_text("Выберите платформу:", reply_markup=InlineKeyboardMarkup([
              [InlineKeyboardButton("YouTube", url="https://www.youtube.com/@Dektrian_TV")],
              [InlineKeyboardButton("Twitch", url="https://www.twitch.tv/dektrian_tv")],
              [InlineKeyboardButton("Группа Telegram", url="https://t.me/dektrian_tv")],
              [InlineKeyboardButton("Канал Telegram", url="https://t.me/dektrian_family")],
              [InlineKeyboardButton("TikTok", url="https://www.tiktok.com/@dektrian_tv")],
              [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
-         ])
-         await query.message.edit_text("Выберите платформу:", reply_markup=socials_keyboard)
-         ]))
+        ])
+        await query.message.edit_text("Выберите платформу:", reply_markup=socials_keyboard)
+        ]))
  
 
 # Основная функция запуска бота

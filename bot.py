@@ -12,9 +12,13 @@ READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT
 
 ADMINS = [
     "@DektrianTV - Лидер всех кланов",
-    "@Ffllooffy - Зам основы и Лидер Еспортс",
+    "@Ffllooffy - Зам Основы и Лидер Еспортс",
+    "@RinaSergeevna - Зам Основы",
+    "@FRUKTIK58 - Зам Основы",
+    "@HEADTRICK2 - Зам Еспортс",
     "@neverforgotme - Лидер Академки",
-    "@Vasvyu6 - Зам Академки"
+    "@Vasvyu6 - Зам Академки",
+    "@kinderskayad - Зам Академки"
 ]
 
 def get_buttons():
@@ -146,7 +150,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     await query.answer()
     context.user_data.clear()
-    await query.message.edit_text("Все введенные данные были сброшены. Начни заново с никнейма.", reply_markup=get_buttons())                 
+    await query.message.edit_text("Все введенные данные были сброшены! Напиши "да" если готов начать заново.", reply_markup=get_buttons())                 
     return READY
 
 async def button_callback(update: Update, context: CallbackContext):

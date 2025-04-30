@@ -171,7 +171,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     return READY
 
 # Обработка всех кнопок
- async def button_callback(update: Update, context: CallbackContext):
+async def button_callback(update: Update, context: CallbackContext):
      query = update.callback_query
      await query.answer()
  @@ -175,46 +159,26 @@ async def button_callback(update: Update, context: CallbackContext):

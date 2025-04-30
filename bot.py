@@ -146,8 +146,12 @@ async def reset(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     await query.answer()
     context.user_data.clear()
-    await query.message.edit_text("Все введенные данные были сброшены. Начни заново с никнейма.", reply_markup=get_buttons())
-    return NICKNAME
+    await query.message.edit_text(
+              "Все данные были сброшены!\n"              
+              "Напиши текстом "да" если готов начать подачу заявки заново.\n",             
+              reply_markup=get_menu_buttons()
+          )
+    return READY
 
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
@@ -160,7 +164,28 @@ async def button_callback(update: Update, context: CallbackContext):
     elif query.data == 'back_button':
         await query.message.edit_reply_markup(reply_markup=get_buttons())
     elif query.data == 'criteria_button':
-        await query.message.edit_text("Критерии DEKTRIAN FAMILY...\n(уже прописаны)", reply_markup=get_menu_buttons())
+        await query.message.edit_text(
+              "Критерии клана DEKTRIAN FAMILY:\n"
+              "1. Смена тега в течении 7 дней.\n"
+              "2. Кд на 100 матчей (Девушки - 4; Мужчины - 5)\n"
+              "3. Возраст 16+.\n"
+              "4. Актив в телеграмм чате.\n"
+              "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
+              "_________________________________\n"
+              "Критерии клана DEKTRIAN ACADEMY:\n"
+              "1. Смена тега в течении 7 дней.\n"
+              "2. Кд и матчи не важны.\n"
+              "3. Возраст 14+.\n"
+              "4. Актив в телеграмм чате.\n"
+              "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
+              "_________________________________\n"
+              "Критерии клана DEKTRIAN ESPORTS:\n"
+              "1. Смена тега в течении 7 дней.\n"
+              "2. Возраст 16+\n"
+              "3. Наличие результатов и хайлайтов\n"
+              "4. Преимущество отдается собранным пакам\n",              
+              reply_markup=get_menu_buttons()
+          )
     elif query.data == 'admins_button':
         await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
     elif query.data == 'socials_button':

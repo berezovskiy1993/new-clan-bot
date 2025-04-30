@@ -174,7 +174,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
- @@ -175,46 +159,26 @@ async def button_callback(update: Update, context: CallbackContext):
+@@ -175,46 +159,26 @@ async def button_callback(update: Update, context: CallbackContext):
         await query.message.edit_reply_markup(reply_markup=get_buttons())
     elif query.data == 'criteria_button':
         await query.message.edit_text(

@@ -1,18 +1,15 @@
 import os
-from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext, CallbackQueryHandler
 
-# Загружаем переменные из .env
-load_dotenv()
-TOKEN = os.getenv("API_TOKEN")
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
-GROUP_ID = -1002640250280  # Это можно тоже вынести в .env при желании
+# Загружаем переменные окружения (только через Render)
+TOKEN = os.environ.get("API_TOKEN")
+ADMIN_ID = int(os.environ.get("ADMIN_ID"))
+GROUP_ID = -1002640250280  # при желании тоже можно вынести в env
 
 # Этапы анкеты
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT_1, KD_PREVIOUS, MATCHES_PREVIOUS, SCREENSHOT_2 = range(11)
 
-# Список админов
 ADMINS = [
     "@DektrianTV - Лидер всех кланов",
     "@Ffllooffy - Зам основы и Лидер Еспортс",
@@ -22,10 +19,8 @@ ADMINS = [
 
 def get_buttons():
     return InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton("Меню", callback_data='menu'),
-            InlineKeyboardButton("Сначала", callback_data='reset_button')
-        ]
+        [InlineKeyboardButton("Меню", callback_data='menu'),
+         InlineKeyboardButton("Сначала", callback_data='reset_button')]
     ])
 
 def get_menu_buttons():
@@ -36,8 +31,14 @@ def get_menu_buttons():
         [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
     ])
 
+# Старт
 async def start(update: Update, context: CallbackContext) -> int:
+    await update.message.reply_photo(
+        photo="https://ibb.co/JRbbTWsQ",
+        caption=" "
+    )
     await update.message.reply_text(
+        
         "👋 Привет!\n\n"
         "Ты попал в бот клана DEKTRIAN FAMILY!\n"
         "Здесь ты можешь подать заявку в один из кланов:\n\n"
@@ -46,6 +47,7 @@ async def start(update: Update, context: CallbackContext) -> int:
         "▫️ ACADEMY — клан свободного стиля\n\n"
         "Напиши текстом 'да' и проходи анкету 📝\n\n",
         reply_markup=get_buttons()
+       
     )
     return READY
 
@@ -158,10 +160,7 @@ async def button_callback(update: Update, context: CallbackContext):
     elif query.data == 'back_button':
         await query.message.edit_reply_markup(reply_markup=get_buttons())
     elif query.data == 'criteria_button':
-        await query.message.edit_text(
-            "Критерии DEKTRIAN FAMILY...\n(уже прописаны)",
-            reply_markup=get_menu_buttons()
-        )
+        await query.message.edit_text("Критерии DEKTRIAN FAMILY...\n(уже прописаны)", reply_markup=get_menu_buttons())
     elif query.data == 'admins_button':
         await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
     elif query.data == 'socials_button':

@@ -24,19 +24,22 @@ ADMINS = [
 
 # Кнопки, отображающиеся во всех этапах анкеты
 def get_buttons():
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton("Меню", callback_data='menu'),
-         InlineKeyboardButton("Сначала", callback_data='reset_button')]
-    ])
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton("Меню", callback_data='menu'),
+        InlineKeyboardButton("Сначала", callback_data='reset_button')
+    ]])
 
 # Кнопки меню
 def get_menu_buttons():
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
-        [InlineKeyboardButton("Админы", callback_data='admins_button')],
-        [InlineKeyboardButton("Соцсети", callback_data='socials_button')],
-        [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
-    ])
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton("Критерии", callback_data='criteria_button')
+    ], [
+        InlineKeyboardButton("Админы", callback_data='admins_button')
+    ], [
+        InlineKeyboardButton("Соцсети", callback_data='socials_button')
+    ], [
+        InlineKeyboardButton("⬅ Назад", callback_data='back_button')
+    ]])
 
 # Команда /start запускает анкету
 async def start(update: Update, context: CallbackContext) -> int:
@@ -70,105 +73,6 @@ async def ready(update: Update, context: CallbackContext) -> int:
     else:
         await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.", reply_markup=get_buttons())
         return READY
-
-# Получение никнейма игрока
-async def nickname(update: Update, context: CallbackContext) -> int:
-    context.user_data["nickname"] = update.message.text
-    await update.message.reply_text("Теперь укажи свой игровой айди.", reply_markup=get_buttons())
-    return PLAYER_ID
-
-# Получение игрового ID
-async def player_id(update: Update, context: CallbackContext) -> int:
-    context.user_data["player_id"] = update.message.text
-    await update.message.reply_text("Сколько тебе полных лет?", reply_markup=get_buttons())
-    return AGE
-
-# Получение возраста
-async def age(update: Update, context: CallbackContext) -> int:
-    context.user_data["age"] = update.message.text
-    await update.message.reply_text("Ты девочка или парень?", reply_markup=get_buttons())
-    return GENDER
-
-# Получение пола
-async def gender(update: Update, context: CallbackContext) -> int:
-    context.user_data["gender"] = update.message.text.lower()
-    await update.message.reply_text("Какой у тебя КД за текущий сезон?", reply_markup=get_buttons())
-    return KD_CURRENT
-
-# Получение текущего КД
-async def kd_current(update: Update, context: CallbackContext) -> int:
-    context.user_data["kd_current"] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?", reply_markup=get_buttons())
-    return MATCHES_CURRENT
-
-# Получение количества матчей в текущем сезоне
-async def matches_current(update: Update, context: CallbackContext) -> int:
-    context.user_data["matches_current"] = update.message.text
-    await update.message.reply_text("Отправь скриншот статистики за текущий сезон.", reply_markup=get_buttons())
-    return SCREENSHOT_1
-
-# Получение скриншота текущего сезона
-async def screenshot_1(update: Update, context: CallbackContext) -> int:
-    if update.message.photo:
-        context.user_data["screenshot_1"] = update.message.photo[-1].file_id
-        await update.message.reply_text("Теперь укажи КД за прошлый сезон.", reply_markup=get_buttons())
-        return KD_PREVIOUS
-    await update.message.reply_text("Пожалуйста, отправьте скриншот.")
-    return SCREENSHOT_1
-
-# Получение КД прошлого сезона
-async def kd_previous(update: Update, context: CallbackContext) -> int:
-    context.user_data["kd_previous"] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?", reply_markup=get_buttons())
-    return MATCHES_PREVIOUS
-
-# Получение количества матчей в прошлом сезоне
-async def matches_previous(update: Update, context: CallbackContext) -> int:
-    context.user_data["matches_previous"] = update.message.text
-    await update.message.reply_text("Теперь отправь скриншот за прошлый сезон.", reply_markup=get_buttons())
-    return SCREENSHOT_2
-
-# Получение скриншота прошлого сезона и отправка анкеты админу
-async def screenshot_2(update: Update, context: CallbackContext) -> int:
-    if update.message.photo:
-        context.user_data["screenshot_2"] = update.message.photo[-1].file_id
-        u = update.message.from_user
-        # Сбор анкеты в текст
-        msg = (
-            f"Заявка на вступление в клан DEKTRIAN FAMILY:\n"
-            f"Игровой ник: {context.user_data['nickname']}\n"
-            f"Игровой айди: {context.user_data['player_id']}\n"
-            f"Возраст: {context.user_data['age']}\n"
-            f"Пол: {context.user_data['gender']}\n"
-            f"КД за текущий сезон: {context.user_data['kd_current']}\n"
-            f"Матчи в текущем сезоне: {context.user_data['matches_current']}\n"
-            f"КД за прошлый сезон: {context.user_data['kd_previous']}\n"
-            f"Матчи в прошлом сезоне: {context.user_data['matches_previous']}\n"
-            f"Telegram Username: @{u.username}\n"
-            f"Telegram UserID: {u.id}\n"
-        )
-        # Отправка анкеты и скриншотов в ЛС и группу
-        try:
-            await context.bot.send_message(ADMIN_ID, msg)
-            await context.bot.send_message(GROUP_ID, msg)
-            await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_1'])
-            await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_2'])
-            await context.bot.send_photo(GROUP_ID, context.user_data['screenshot_1'])
-            await context.bot.send_photo(GROUP_ID, context.user_data['screenshot_2'])
-        except Exception as e:
-            await update.message.reply_text(f"Ошибка при отправке: {e}")
-        await update.message.reply_text("✅ Ваша заявка отправлена. Ожидайте ответ!", reply_markup=get_buttons())
-        return ConversationHandler.END
-    await update.message.reply_text("Пожалуйста, отправьте скриншот.")
-    return SCREENSHOT_2
-
-# Сброс анкеты
-async def reset(update: Update, context: CallbackContext) -> int:
-    query = update.callback_query
-    await query.answer()
-    context.user_data.clear()
-    await query.message.edit_text("Все введенные данные были сброшены. Если готов начать подачу анкеты заново, то напиши да!", reply_markup=get_buttons())
-    return READY
 
 # Обработка всех кнопок
 async def button_callback(update: Update, context: CallbackContext):
@@ -212,6 +116,10 @@ async def button_callback(update: Update, context: CallbackContext):
             [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
         ])
         await query.message.edit_text("Выберите платформу:", reply_markup=socials_keyboard)
+    elif query.data == 'back_button':
+        # Возвращаем пользователя в главное меню
+        await query.message.edit_reply_markup(reply_markup=get_menu_buttons())
+        await query.message.edit_text("Вы в главном меню. Выберите нужную опцию:", reply_markup=get_menu_buttons())
 
 # Основная функция запуска бота
 def main():

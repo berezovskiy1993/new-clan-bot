@@ -5,11 +5,13 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 # Загружаем переменные окружения (только через Render)
 TOKEN = os.environ.get("API_TOKEN")
 ADMIN_ID = int(os.environ.get("ADMIN_ID"))
-GROUP_ID = -1002640250280  # при желании тоже можно вынести в env
+GROUP_ID = -1002640250280  # основная группа для заявок
+EXTRA_GROUP_ID = -1002011191845  # дополнительная группа, куда тоже отправляется заявка
 
-# Этапы анкеты
+# Этапы анкеты (нумеруются для использования ConversationHandler)
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT_1, KD_PREVIOUS, MATCHES_PREVIOUS, SCREENSHOT_2 = range(11)
 
+# Список админов
 ADMINS = [
     "@DektrianTV - Лидер всех кланов",
     "@Ffllooffy - Зам Основы и Лидер Еспортс",
@@ -21,12 +23,14 @@ ADMINS = [
     "@kinderskayad - Зам Академки"
 ]
 
+# Кнопки "Меню" и "Сначала"
 def get_buttons():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("Меню", callback_data='menu'),
          InlineKeyboardButton("Сначала", callback_data='reset_button')]
     ])
 
+# Кнопки меню
 def get_menu_buttons():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
@@ -35,14 +39,13 @@ def get_menu_buttons():
         [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
     ])
 
-# Старт
+# Команда /start — начало анкеты
 async def start(update: Update, context: CallbackContext) -> int:
     await update.message.reply_photo(
         photo="https://ibb.co/JRbbTWsQ",
         caption=" "
     )
     await update.message.reply_text(
-        
         "👋 Привет!\n\n"
         "Ты попал в бот клана DEKTRIAN FAMILY!\n"
         "Здесь ты можешь подать заявку в один из кланов:\n\n"
@@ -51,10 +54,10 @@ async def start(update: Update, context: CallbackContext) -> int:
         "▫️ ACADEMY — клан свободного стиля\n\n"
         "Напиши текстом 'да' и проходи анкету 📝\n\n",
         reply_markup=get_buttons()
-       
     )
     return READY
 
+# Ответ на "да" или "нет"
 async def ready(update: Update, context: CallbackContext) -> int:
     text = update.message.text.lower()
     if text == "да":
@@ -67,6 +70,7 @@ async def ready(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.", reply_markup=get_buttons())
         return READY
 
+# Шаги анкеты — запись ответов пользователя
 async def nickname(update: Update, context: CallbackContext) -> int:
     context.user_data["nickname"] = update.message.text
     await update.message.reply_text("Теперь укажи свой игровой айди.", reply_markup=get_buttons())
@@ -115,10 +119,13 @@ async def matches_previous(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Теперь отправь скриншот за прошлый сезон.", reply_markup=get_buttons())
     return SCREENSHOT_2
 
+# Финальный шаг — сбор всех данных и отправка в 3 чата
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
     if update.message.photo:
         context.user_data["screenshot_2"] = update.message.photo[-1].file_id
         u = update.message.from_user
+
+        # Сообщение с данными анкеты
         msg = (
             f"Заявка на вступление в клан DEKTRIAN FAMILY:\n"
             f"Игровой ник: {context.user_data['nickname']}\n"
@@ -132,20 +139,33 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
             f"Telegram Username: @{u.username}\n"
             f"Telegram UserID: {u.id}\n"
         )
+
         try:
+            # Отправка текста и фото администратору
             await context.bot.send_message(ADMIN_ID, msg)
-            await context.bot.send_message(GROUP_ID, msg)
             await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_1'])
             await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_2'])
+
+            # Отправка текста и фото в основную группу
+            await context.bot.send_message(GROUP_ID, msg)
             await context.bot.send_photo(GROUP_ID, context.user_data['screenshot_1'])
             await context.bot.send_photo(GROUP_ID, context.user_data['screenshot_2'])
+
+            # Отправка текста и фото в дополнительную группу
+            await context.bot.send_message(EXTRA_GROUP_ID, msg)
+            await context.bot.send_photo(EXTRA_GROUP_ID, context.user_data['screenshot_1'])
+            await context.bot.send_photo(EXTRA_GROUP_ID, context.user_data['screenshot_2'])
+
         except Exception as e:
             await update.message.reply_text(f"Ошибка при отправке: {e}")
+
         await update.message.reply_text("✅ Ваша заявка отправлена. Ожидайте ответ!", reply_markup=get_buttons())
         return ConversationHandler.END
+
     await update.message.reply_text("Пожалуйста, отправьте скриншот.")
     return SCREENSHOT_2
 
+# Сброс данных анкеты
 async def reset(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     await query.answer()
@@ -153,6 +173,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     await query.message.edit_text("Все введенные данные были сброшены! Напиши да если готов начать заново.", reply_markup=get_buttons())                 
     return READY
 
+# Обработка всех кнопок
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
@@ -165,27 +186,27 @@ async def button_callback(update: Update, context: CallbackContext):
         await query.message.edit_reply_markup(reply_markup=get_buttons())
     elif query.data == 'criteria_button':
         await query.message.edit_text(
-              "Критерии клана DEKTRIAN FAMILY:\n"
-              "1. Смена тега в течении 7 дней.\n"
-              "2. Кд на 100 матчей (Девушки - 4; Мужчины - 5)\n"
-              "3. Возраст 16+.\n"
-              "4. Актив в телеграмм чате.\n"
-              "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
-              "_________________________________\n"
-              "Критерии клана DEKTRIAN ACADEMY:\n"
-              "1. Смена тега в течении 7 дней.\n"
-              "2. Кд и матчи не важны.\n"
-              "3. Возраст 14+.\n"
-              "4. Актив в телеграмм чате.\n"
-              "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
-              "_________________________________\n"
-              "Критерии клана DEKTRIAN ESPORTS:\n"
-              "1. Смена тега в течении 7 дней.\n"
-              "2. Возраст 16+\n"
-              "3. Наличие результатов и хайлайтов\n"
-              "4. Преимущество отдается собранным пакам\n",              
-              reply_markup=get_menu_buttons()
-          )
+            "Критерии клана DEKTRIAN FAMILY:\n"
+            "1. Смена тега в течении 7 дней.\n"
+            "2. Кд на 100 матчей (Девушки - 4; Мужчины - 5)\n"
+            "3. Возраст 16+.\n"
+            "4. Актив в телеграмм чате.\n"
+            "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
+            "_________________________________\n"
+            "Критерии клана DEKTRIAN ACADEMY:\n"
+            "1. Смена тега в течении 7 дней.\n"
+            "2. Кд и матчи не важны.\n"
+            "3. Возраст 14+.\n"
+            "4. Актив в телеграмм чате.\n"
+            "5. Участие на стримах Лидера и клановых мероприятиях.\n\n"
+            "_________________________________\n"
+            "Критерии клана DEKTRIAN ESPORTS:\n"
+            "1. Смена тега в течении 7 дней.\n"
+            "2. Возраст 16+\n"
+            "3. Наличие результатов и хайлайтов\n"
+            "4. Преимущество отдается собранным пакам\n",
+            reply_markup=get_menu_buttons()
+        )
     elif query.data == 'admins_button':
         await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
     elif query.data == 'socials_button':
@@ -198,6 +219,7 @@ async def button_callback(update: Update, context: CallbackContext):
             [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
         ]))
 
+# Основной запуск бота
 def main():
     application = Application.builder().token(TOKEN).build()
 

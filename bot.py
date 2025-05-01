@@ -6,7 +6,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 TOKEN = os.environ.get("API_TOKEN")
 ADMIN_ID = int(os.environ.get("ADMIN_ID"))
 GROUP_ID = -1002640250280  # основная группа для заявок
-EXTRA_GROUP_ID = -1002011191845  # дополнительная группа, куда тоже отправляется заявка
+ # EXTRA_GROUP_ID = -1002011191845  # дополнительная группа, куда тоже отправляется заявка
 
 # Этапы анкеты (нумеруются для использования ConversationHandler)
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT_1, KD_PREVIOUS, MATCHES_PREVIOUS, SCREENSHOT_2 = range(11)

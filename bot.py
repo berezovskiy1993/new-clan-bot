@@ -167,7 +167,7 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         except Exception as e:
             await update.message.reply_text(f"Ошибка при отправке: {e}", reply_markup=get_reply_keyboard())
         await update.message.reply_text("✅ Ваша заявка отправлена. Ожидайте ответ!", reply_markup=get_reply_keyboard())
-        return ConversationHandler.END
+        return await start(update, context)
     await update.message.reply_text("Пожалуйста, отправьте скриншот.", reply_markup=get_reply_keyboard())
     return SCREENSHOT_2
 
@@ -180,9 +180,11 @@ async def reset(update: Update, context: CallbackContext) -> int:
     )
     return READY
 
+# Обработка всех кнопок
 async def button_callback(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
+
     if query.data == 'reset_button':
         return await reset(update, context)
     elif query.data == 'menu':

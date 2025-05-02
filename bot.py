@@ -1,15 +1,17 @@
 import os
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext, CallbackQueryHandler
 
-# Загружаем переменные окружения
+# Загружаем переменные окружения (только через Render)
 TOKEN = os.environ.get("API_TOKEN")
 ADMIN_ID = int(os.environ.get("ADMIN_ID"))
-GROUP_ID = -1002640250280
-EXTRA_GROUP_ID = -1002011191845
+GROUP_ID = -1002640250280  # основная группа для заявок
+#EXTRA_GROUP_ID = -1002011191845  # дополнительная группа, куда тоже отправляется заявка
 
+# Этапы анкеты (нумеруются для использования ConversationHandler)
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT_1, KD_PREVIOUS, MATCHES_PREVIOUS, SCREENSHOT_2 = range(11)
 
+# Список админов
 ADMINS = [
     "@DektrianTV - Лидер всех кланов",
     "@Ffllooffy - Зам Основы и Лидер Еспортс",
@@ -21,12 +23,14 @@ ADMINS = [
     "@kinderskayad - Зам Академки"
 ]
 
+# Кнопки "Меню" и "Сначала"
 def get_buttons():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("Меню", callback_data='menu'),
          InlineKeyboardButton("Сначала", callback_data='reset_button')]
     ])
 
+# Кнопки меню
 def get_menu_buttons():
     return InlineKeyboardMarkup([
         [InlineKeyboardButton("Критерии", callback_data='criteria_button')],
@@ -35,13 +39,7 @@ def get_menu_buttons():
         [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
     ])
 
-def get_reply_keyboard():
-    return ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton("🔁 Вернуться на старт")]],
-        resize_keyboard=True,
-        one_time_keyboard=False
-    )
-
+# Команда /start — начало анкеты
 async def start(update: Update, context: CallbackContext) -> int:
     await update.message.reply_photo(
         photo="https://ibb.co/JRbbTWsQ",
@@ -55,92 +53,79 @@ async def start(update: Update, context: CallbackContext) -> int:
         "▫️ ESPORTS — клан для турнирных составов\n"
         "▫️ ACADEMY — клан свободного стиля\n\n"
         "Напиши текстом 'да' и проходи анкету 📝\n\n",
-        reply_markup=get_reply_keyboard()
+        reply_markup=get_buttons()
     )
     return READY
 
+# Ответ на "да" или "нет"
 async def ready(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     text = update.message.text.lower()
     if text == "да":
-        await update.message.reply_text("Отлично! Напиши свой игровой никнейм.", reply_markup=get_reply_keyboard())
+        await update.message.reply_text("Отлично! Напиши свой игровой никнейм.", reply_markup=get_buttons())
         return NICKNAME
     elif text == "нет":
-        await update.message.reply_text("Если передумаешь, напиши 'да'.", reply_markup=get_reply_keyboard())
+        await update.message.reply_text("Если передумаешь, напиши 'да'.", reply_markup=get_buttons())
         return READY
     else:
-        await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.", reply_markup=get_reply_keyboard())
+        await update.message.reply_text("Пожалуйста, ответь 'да' или 'нет'.", reply_markup=get_buttons())
         return READY
 
+# Шаги анкеты — запись ответов пользователя
 async def nickname(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["nickname"] = update.message.text
-    await update.message.reply_text("Теперь укажи свой игровой айди.", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Теперь укажи свой игровой айди.", reply_markup=get_buttons())
     return PLAYER_ID
 
 async def player_id(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["player_id"] = update.message.text
-    await update.message.reply_text("Сколько тебе полных лет?", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Сколько тебе полных лет?", reply_markup=get_buttons())
     return AGE
 
 async def age(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["age"] = update.message.text
-    await update.message.reply_text("Ты девочка или парень?", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Ты девочка или парень?", reply_markup=get_buttons())
     return GENDER
 
 async def gender(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["gender"] = update.message.text.lower()
-    await update.message.reply_text("Какой у тебя КД за текущий сезон?", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Какой у тебя КД за текущий сезон?", reply_markup=get_buttons())
     return KD_CURRENT
 
 async def kd_current(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["kd_current"] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Сколько матчей ты сыграл в текущем сезоне?", reply_markup=get_buttons())
     return MATCHES_CURRENT
 
 async def matches_current(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["matches_current"] = update.message.text
-    await update.message.reply_text("Отправь скриншот статистики за текущий сезон.", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Отправь скриншот статистики за текущий сезон.", reply_markup=get_buttons())
     return SCREENSHOT_1
 
 async def screenshot_1(update: Update, context: CallbackContext) -> int:
     if update.message.photo:
         context.user_data["screenshot_1"] = update.message.photo[-1].file_id
-        await update.message.reply_text("Теперь укажи КД за прошлый сезон.", reply_markup=get_reply_keyboard())
+        await update.message.reply_text("Теперь укажи КД за прошлый сезон.", reply_markup=get_buttons())
         return KD_PREVIOUS
-    await update.message.reply_text("Пожалуйста, отправьте скриншот.", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Пожалуйста, отправьте скриншот.")
     return SCREENSHOT_1
 
 async def kd_previous(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["kd_previous"] = update.message.text
-    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Сколько матчей ты сыграл в прошлом сезоне?", reply_markup=get_buttons())
     return MATCHES_PREVIOUS
 
 async def matches_previous(update: Update, context: CallbackContext) -> int:
-    if update.message.text == "🔁 Вернуться на старт":
-        return await start(update, context)
     context.user_data["matches_previous"] = update.message.text
-    await update.message.reply_text("Теперь отправь скриншот за прошлый сезон.", reply_markup=get_reply_keyboard())
+    await update.message.reply_text("Теперь отправь скриншот за прошлый сезон.", reply_markup=get_buttons())
     return SCREENSHOT_2
 
+# Финальный шаг — сбор всех данных и отправка в 3 чата
 async def screenshot_2(update: Update, context: CallbackContext) -> int:
     if update.message.photo:
         context.user_data["screenshot_2"] = update.message.photo[-1].file_id
         u = update.message.from_user
+
+        # Сообщение с данными анкеты
         msg = (
             f"Заявка на вступление в клан DEKTRIAN FAMILY:\n"
             f"Игровой ник: {context.user_data['nickname']}\n"
@@ -154,30 +139,38 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
             f"Telegram Username: @{u.username}\n"
             f"Telegram UserID: {u.id}\n"
         )
+
         try:
+            # Отправка текста и фото администратору
             await context.bot.send_message(ADMIN_ID, msg)
             await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_1'])
             await context.bot.send_photo(ADMIN_ID, context.user_data['screenshot_2'])
+
+            # Отправка текста и фото в основную группу
             await context.bot.send_message(GROUP_ID, msg)
             await context.bot.send_photo(GROUP_ID, context.user_data['screenshot_1'])
             await context.bot.send_photo(GROUP_ID, context.user_data['screenshot_2'])
+
+            # Отправка текста и фото в дополнительную группу
             await context.bot.send_message(EXTRA_GROUP_ID, msg)
             await context.bot.send_photo(EXTRA_GROUP_ID, context.user_data['screenshot_1'])
             await context.bot.send_photo(EXTRA_GROUP_ID, context.user_data['screenshot_2'])
+
         except Exception as e:
-            await update.message.reply_text(f"Ошибка при отправке: {e}", reply_markup=get_reply_keyboard())
-        await update.message.reply_text("✅ Ваша заявка отправлена. Ожидайте ответ!", reply_markup=get_reply_keyboard())
+            await update.message.reply_text(f"Ошибка при отправке: {e}")
+
+        await update.message.reply_text("✅ Ваша заявка отправлена. Ожидайте ответ!", reply_markup=get_buttons())
         return await start(update, context)
-    await update.message.reply_text("Пожалуйста, отправьте скриншот.", reply_markup=get_reply_keyboard())
+
+    await update.message.reply_text("Пожалуйста, отправьте скриншот.")
     return SCREENSHOT_2
 
+# Сброс данных анкеты
 async def reset(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     await query.answer()
     context.user_data.clear()
-    await query.message.edit_text(
-        "Все введенные данные были сброшены! Напиши да если готов начать заново.", reply_markup=get_buttons()
-    )
+    await query.message.edit_text("Все введенные данные были сброшены! Напиши да если готов начать заново.", reply_markup=get_buttons())                 
     return READY
 
 # Обработка всех кнопок
@@ -226,6 +219,7 @@ async def button_callback(update: Update, context: CallbackContext):
             [InlineKeyboardButton("⬅ Назад", callback_data='back_button')]
         ]))
 
+# Основной запуск бота
 def main():
     application = Application.builder().token(TOKEN).build()
 

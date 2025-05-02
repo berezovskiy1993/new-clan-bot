@@ -158,7 +158,7 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("✅ Ваша заявка отправлена. Ожидайте ответ!", reply_markup=get_buttons())
         await asyncio.sleep(5)
         await update.message.reply_text("Хотите подать еще одну заявку? Напиши 'да' или 'нет'", reply_markup=get_buttons())
-        return READY(update, context)
+        return READY
 
     await update.message.reply_text("Пожалуйста, отправьте скриншот.")
     return SCREENSHOT_2

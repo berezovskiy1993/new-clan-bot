@@ -168,7 +168,7 @@ async def reset(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     await query.answer()
     context.user_data.clear()
-    await query.message.edit_text("Все введенные данные были сброшены! Напиши да если готов начать заново.", reply_markup=get_buttons())                 
+    await query.message.edit_text("Все введенные данные были сброшены! Напиши 'да' если готов начать заново.", reply_markup=get_buttons())                 
     return READY
 
 # Обработка кнопок
@@ -206,7 +206,7 @@ async def button_callback(update: Update, context: CallbackContext):
             reply_markup=get_menu_buttons()
         )
     elif query.data == 'admins_button':
-        await query.message.edit_text("Список админов:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
+        await query.message.edit_text("Список админов клана:\n" + "\n".join(ADMINS), reply_markup=get_menu_buttons())
     elif query.data == 'socials_button':
         await query.message.edit_text("Выберите платформу:", reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("YouTube", url="https://www.youtube.com/@Dektrian_TV")],

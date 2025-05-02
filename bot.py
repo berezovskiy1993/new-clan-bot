@@ -7,7 +7,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 TOKEN = os.environ.get("API_TOKEN")
 ADMIN_ID = int(os.environ.get("ADMIN_ID"))
 GROUP_ID = -1002640250280  # основная группа для заявок
-EXTRA_GROUP_ID = -1002011191845  # дополнительная группа, куда тоже отправляется заявка
+# EXTRA_GROUP_ID = -1002011191845  # дополнительная группа, куда тоже отправляется заявка
 
 # Этапы анкеты
 READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT_1, KD_PREVIOUS, MATCHES_PREVIOUS, SCREENSHOT_2 = range(11)
@@ -156,8 +156,9 @@ async def screenshot_2(update: Update, context: CallbackContext) -> int:
             await update.message.reply_text(f"Ошибка при отправке: {e}")
 
         await update.message.reply_text("✅ Ваша заявка отправлена. Ожидайте ответ!", reply_markup=get_buttons())
-        await asyncio.sleep(5)
-        return await start(update, context)
+        await asyncio.sleep(2)
+        await update.message.reply_text("Хотите подать еще одну заявку? Напиши 'да' или 'нет'", reply_markup=get_buttons())
+        return await READY(update, context)
 
     await update.message.reply_text("Пожалуйста, отправьте скриншот.")
     return SCREENSHOT_2

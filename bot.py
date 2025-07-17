@@ -22,7 +22,7 @@ ADMINS = [
     "@HIMORI_why - Зам Еспортс",
     "@RinaSergeevna - Зам Еспортс",
     "@neverforgotme - Лидер Академки",
-    "@kinderskayad - Зам Академки"
+    "@kinderskayad - Зам Академки",
     "@Vasvyu6 - Зам Академки"
 ]
 

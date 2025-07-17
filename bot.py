@@ -15,13 +15,15 @@ READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT
 # Список админов
 ADMINS = [
     "@DektrianTV - Лидер всех кланов",
-    "@Ffllooffy - Зам Основы и Лидер Еспортс",
-    "@RinaSergeevna - Зам Основы",
+    "@doompubg - Зам Основы",
+    "@Angel_of_rain - Зам Основы",
     "@FRUKTIK58 - Зам Основы",
-    "@HEADTRICK2 - Зам Еспортс",
+    "@Z_is_the - Лидер Еспортс",
+    "@HIMORI_why - Зам Еспортс",
+    "@RinaSergeevna - Зам Еспортс",
     "@neverforgotme - Лидер Академки",
-    "@Vasvyu6 - Зам Академки",
     "@kinderskayad - Зам Академки"
+    "@Vasvyu6 - Зам Академки"
 ]
 
 # Кнопки "Меню" и "Сначала"

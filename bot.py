@@ -17,9 +17,9 @@ ADMINS = [
     "@DektrianTV - Лидер всех кланов",
     "@doompubg - Лидер Основы",
     "@Angel_of_rain - Зам Основы",
-    "@ZedissZ - Зам Основы",
+    "@FRUKTIK58 - Зам Основы",
     "@mveemve - Лидер Еспортс",
-    "@kinderskayad - Лидер Академки",   
+    "@TipaAlastor - Лидер Академки",   
 ]
 
 # Кнопки "Меню" и "Сначала"

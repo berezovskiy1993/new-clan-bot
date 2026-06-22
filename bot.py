@@ -15,7 +15,7 @@ READY, NICKNAME, PLAYER_ID, AGE, GENDER, KD_CURRENT, MATCHES_CURRENT, SCREENSHOT
 # Список админов
 ADMINS = [
     "@DektrianTV - Лидер всех кланов",
-    "@doompubg - Лидер Основы",
+    "@D13Alastor - Лидер Основы",
     "@Angel_of_rain - Зам Основы",
     "@FRUKTIK58 - Зам Основы",
     "@D13_cocomber - Лидер Академки",   
